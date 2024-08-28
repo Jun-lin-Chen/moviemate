@@ -1,56 +1,23 @@
 # MovieReommendationSystem
 
-#### 功能
-1. 用户注册登录 用户数据管理 -
-2. 电影搜索 -
-3. 电影推荐（综合各大视频网站，给出一个推荐指数） - 
-4. 电影筛选 如：2024/喜剧/时长 -
-5. 浏览记录 -
-6. 收藏夹 -
-7. 评论区词云展示 -
-8. 黑名单（屏蔽某一类电影/某一部电影） -
-9. ......
+## 系统说明
+### 基础功能
+1.用户管理 + 用户画像 （基于搜索偏好，通过电影类别做）
+2.根据电影名字综合各个网站评分给出一个推荐值（真值）
+3.已网页GUI进行交互
 
-#### 第二周任务
-##### 1. 爬取数据 + 构建数据库
-1. 豆瓣网 -CJL
-2. 电影天堂 -LZH
-3. ......
-##### 2. 网页雏形 -TYK
-#### 介绍
-{**以下是 Gitee 平台说明，您可以替换此简介**
-Gitee 是 OSCHINA 推出的基于 Git 的代码托管平台（同时支持 SVN）。专为开发者提供稳定、高效、安全的云端软件开发协作平台
-无论是个人、团队、或是企业，都能够用 Gitee 实现代码托管、项目管理、协作开发。企业项目请看 [https://gitee.com/enterprises](https://gitee.com/enterprises)}
+### 拓展功能
+1. 电影筛选
+2.评论区词云展示
+3.黑名单（屏蔽某一类电影/某一部电影 / 根据用户特点屏蔽（如未成年））
+4.根据用户画像推荐可能喜爱的电影
+5.待补充...
 
-#### 软件架构
-软件架构说明
+##进度规划
+#### 第一、二周任务
+1. 爬取数据- LZH （初步定为多个主流视频平台的电影名称 + 评分 + 类别）
+2. SQL数据管理 -CJL
+3. 初版交互界面 -TYK
 
+#XDM，干他
 
-#### 安装教程
-
-1.  xxxx
-2.  xxxx
-3.  xxxx
-
-#### 使用说明
-
-1.  xxxx
-2.  xxxx
-3.  xxxx
-
-#### 参与贡献
-
-1.  Fork 本仓库
-2.  新建 Feat_xxx 分支
-3.  提交代码
-4.  新建 Pull Request
-
-
-#### 特技
-
-1.  使用 Readme\_XXX.md 来支持不同的语言，例如 Readme\_en.md, Readme\_zh.md
-2.  Gitee 官方博客 [blog.gitee.com](https://blog.gitee.com)
-3.  你可以 [https://gitee.com/explore](https://gitee.com/explore) 这个地址来了解 Gitee 上的优秀开源项目
-4.  [GVP](https://gitee.com/gvp) 全称是 Gitee 最有价值开源项目，是综合评定出的优秀开源项目
-5.  Gitee 官方提供的使用手册 [https://gitee.com/help](https://gitee.com/help)
-6.  Gitee 封面人物是一档用来展示 Gitee 会员风采的栏目 [https://gitee.com/gitee-stars/](https://gitee.com/gitee-stars/)
