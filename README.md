@@ -1,5 +1,6 @@
-# MovieReommendationSystem
-
+# MovieMate
+## ——A Custom Movie Recommendation System
+![img.png](img.png)
 ## 系统说明
 
 ---

@@ -8,3 +8,7 @@ def helloworld(request):  # request是必须带的实例。类似class下方法�
 
 def index_view(request):
     return render(request, 'index.html')
+def post_view(request):
+    return render(request, 'post.html')
+def author_view(request):
+    return render(request, 'author.html')
