@@ -110,4 +110,4 @@ with open("movies.csv", mode="w", newline="", encoding="utf-8") as file:
 print("电影信息已写入到 movies.csv。")
 
 # 关闭浏览器
-browser.quit()
+browser.quit() 
