@@ -1,9 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
 import csv
-
-from docutils.nodes import reference
-from httpx import Cookies
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -12,102 +9,230 @@ import time
 from PIL import Image
 import cv2
 from selenium.webdriver import ActionChains
-import requests
 from io import BytesIO
-from bs4 import BeautifulSoup
-import csv
+
+class MaoYanCode:
+    def __init__(self, browser):
+        self.browser = browser
+        self.wait = WebDriverWait(browser, 10)
 
 
+    def bg_img_src(self):
+        # 定位背景图
+        bg_img_element = self.wait.until(EC.presence_of_element_located(
+            (By.XPATH, '//*[@class="tc-bg"]/img')))
+        bg_img_src = bg_img_element.get_attribute('src')
+        return bg_img_src
 
-# 目标网页的URL（假设URL为网页中HTML的实际地址）
-url = "https://www.maoyan.com/films?showType=3&offset=30"  # 替换为实际的URL
-headers={
-    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.130 Safari/537.36',
-    'Cookies' :'uuid_n_v=v1; uuid=42CB869066AB11EF9D9773DF9DC75471F2325BCA42E54890BF2195D73349008E; _csrf=4f55617590df55d00dab4158ef19d7a00caf6fb748619b5fcf487e6d14ce0d7f; _lxsdk_cuid=191a26fd241c8-09a26803cb73fd-48667e53-1cb600-191a26fd241c8; HMACCOUNT=48E5DF09246748FD; Hm_lvt_703e94591e87be68cc8da0da7cbd0be2=1725007123; _lx_utm=utm_source%3Dbing%26utm_medium%3Dorganic; WEBDFPID=0vvvvz294y5454yxyzyzzu4ww22xv7w3808z71y8xv4979587w6wu4wz-2040368911171-1725008910129MIGOSWOfd79fef3d01d5e9aadc18ccd4d0c95071503; token=AgEqIDOn2XpMhUexKIWiSMWUVle6sIwMq5aKmTx3NNG9e_zEGJ1W9P1ut0fzQylqWwvy6XvaJwh5DAAAAABrIgAAFE8ZU22PbxF8zjPt3Zj5iBgmgkMDrc4WZiGqCiqsqCGy0kZZvQihR8eY-pwqdOdw; uid=3697692006; uid.sig=rsNz7_NASMgCIsv3kYQDP1W-eGc; _lxsdk=42CB869066AB11EF9D9773DF9DC75471F2325BCA42E54890BF2195D73349008E; Hm_lpvt_703e94591e87be68cc8da0da7cbd0be2=1725008947; __mta=208017325.1725007123161.1725008860134.1725008946963.23; _lxsdk_s=191a26fd242-63-a84-060%7C%7C62',
-    'Reference':'https://passport.maoyan.com/'
-}
-# 配置Selenium WebDriver
-options = webdriver.EdgeOptions()
-options.add_argument("--start-maximized")  # 无头模式（可选）
-browser = webdriver.Edge(options=options)
+    def jpp_img_src(self):
+        # 定位缺块
+        target_img_element = self.wait.until(EC.presence_of_element_located(
+            (By.XPATH, '//*[@class="tc-jpp"]/img')))
+        target_img_src = target_img_element.get_attribute('src')
+        return target_img_src
 
-wait = WebDriverWait(browser, 5)
+    def get_img(self):
+        # 获取背景和缺块图片
+        bg_src = self.bg_img_src()
+        jpp_src = self.jpp_img_src()
+        response1 = requests.get(bg_src)
+        image1 = Image.open(BytesIO(response1.content))
+        image1.save('bg_img.png')
 
-# 打开网页
-browser.get(url)
+        response2 = requests.get(jpp_src)
+        image2 = Image.open(BytesIO(response2.content))
+        image2.save('jpp_img.png')
+        return image1, image2
 
-# 等待10秒钟
-time.sleep(10)
+    def slider_element(self):
+        # 定位滑块
+        time.sleep(2)
+        slider = self.wait.until(EC.presence_of_element_located(
+            (By.XPATH, '//*[@class="tc-drag-thumb"]')))
+        return slider
 
-# 获取当前页面的URL
-current_url = browser.current_url
+    def get_gap(self):
+        # 识别缺口
+        bg_img = cv2.imread("bg_img.png")
+        tp_img = cv2.imread("jpp_img.png")
 
+        bg_edge = cv2.Canny(bg_img, 100, 200)
+        tp_edge = cv2.Canny(tp_img, 100, 200)
 
+        bg_pic = cv2.cvtColor(bg_edge, cv2.COLOR_GRAY2RGB)
+        tp_pic = cv2.cvtColor(tp_edge, cv2.COLOR_GRAY2RGB)
 
-# 发起请求获取网页内容
-response = requests.get(url,headers=headers)
-html_content = response.text
-print(html_content)
+        res = cv2.matchTemplate(bg_pic, tp_pic, cv2.TM_CCOEFF_NORMED)
+        min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
 
-# 创建BeautifulSoup对象来解析HTML
-soup = BeautifulSoup(html_content, "html.parser")
+        height, width = tp_pic.shape[:2]
+        tl = max_loc
+        cv2.rectangle(bg_img, tl, (tl[0] + width - 15, tl[1] + height - 15), (0, 0, 255), 2)
+        cv2.imwrite('../猫眼爬取/result.png', bg_img)
+        return tl[0]
 
-# 打开CSV文件准备写入电影信息
-with open("movies.csv", mode="w", newline="", encoding="utf-8") as file:
-    csv_writer = csv.writer(file)
-    # 写入CSV文件的标题行
-    csv_writer.writerow(["影片名称", "评分", "类型", "主演", "上映日期", "图片URL"])
+    def get_track(self, distance):
+        # 构造移动轨迹
+        track = []
+        current = 0
+        mid = distance * 4 / 5
+        t = 0.2
+        v = 0
+
+        while current < distance:
+            if current < mid:
+                a = 5
+            else:
+                a = -3
+            v0 = v
+            v = v0 + a * t
+            move = v0 * t + 1 / 2 * a * t * t
+            current += move
+            track.append(round(move))
+        return track
+
+    def move_to_gap(self, slider, track):
+        # 移动滑块
+        ActionChains(self.browser).click_and_hold(slider).perform()
+        for x in track:
+            ActionChains(self.browser).move_by_offset(xoffset=x, yoffset=0).perform()
+        time.sleep(0.5)
+        ActionChains(self.browser).release().perform()
+
+    def solve_captcha(self):
+        try:
+            # 切换到验证码 iframe
+            iframe = self.wait.until(
+                EC.presence_of_all_elements_located((By.TAG_NAME, 'iframe'))
+            )
+            self.wait.until(
+                EC.frame_to_be_available_and_switch_to_it(iframe[0])
+            )
+
+            # 获取图片并进行处理
+            self.get_img()
+            slider = self.slider_element()
+            gap = self.get_gap()
+            gap_end = int((gap - 40) / 2)
+            gap_end -= 10
+            track = self.get_track(gap_end)
+            self.move_to_gap(slider, track)
+
+            # 等待验证成功
+            time.sleep(10)
+
+            # 切换回验证码 iframe 进行进一步处理
+            iframe = self.wait.until(
+                EC.presence_of_all_elements_located((By.TAG_NAME, 'iframe'))
+            )
+            self.wait.until(
+                EC.frame_to_be_available_and_switch_to_it(iframe[0])
+            )
+            self.get_img()
+
+        except Exception as e:
+            # 捕获异常并输出错误信息
+            # print(f"Error occurred: {e}")
+            return  # 出现异常时退出函数
+
+def scrape_movies(url, headers):
+    # 配置Selenium WebDriver
+    options = webdriver.EdgeOptions()
+    options.add_argument("--headless")  # 无头模式（可选）--start-maximized，--headless
+    browser = webdriver.Edge(options=options)
+    wait = WebDriverWait(browser, 3)
+
+    # 实例化 MaoYanCode
+    mao_yan_code = MaoYanCode(browser)
+
+    # 打开网页
+    browser.get(url)
+    time.sleep(1)
+    # 解决滑块验证码
+    mao_yan_code.solve_captcha()
+
+    # 发起请求获取网页内容
+    response = requests.get(url, headers=headers)
+    html_content = response.text
+    # print(html_content)
+
+    # 创建BeautifulSoup对象来解析HTML
+    soup = BeautifulSoup(html_content, "html.parser")
 
     # 查找所有电影项
     movie_items = soup.find_all("div", class_="movie-item film-channel")
 
-    for item in movie_items:
-        # 提取影片名称
-        title_tag = item.find("span", class_="name")
-        title = title_tag.text.strip() if title_tag else "N/A"
+    # 打开CSV文件准备写入电影信息
+    with open("movies_my.csv", mode="a", newline="", encoding="utf-8") as file:
+        csv_writer = csv.writer(file)
+        # 写入CSV文件的标题行
+        csv_writer.writerow(["影片名称", "评分", "类型", "主演", "上映日期", "图片URL"])
 
-        # 提取评分
-        rating_tag = item.find("span", class_="score channel-detail-orange")
-        rating = rating_tag.text.strip() if rating_tag else "暂无评分"
+        for item in movie_items:
+            # 提取影片名称
+            title_tag = item.find("span", class_="name")
+            title = title_tag.text.strip() if title_tag else "N/A"
 
-        # 提取电影详细信息
-        hover_info = item.find("div", class_="movie-item-hover")
-        if hover_info:
-            # 提取类型
-            type_text = "N/A"
-            for div in hover_info.find_all("div", class_="movie-hover-title"):
-                if "类型:" in div.get_text():
-                    type_text = div.get_text(strip=True).split("类型:")[1].strip()
-                    break
+            # 提取评分
+            rating_tag = item.find("span", class_="score channel-detail-orange")
+            rating = rating_tag.text.strip() if rating_tag else "暂无评分"
 
-            # 提取主演
-            cast_text = "N/A"
-            for div in hover_info.find_all("div", class_="movie-hover-title"):
-                if "主演:" in div.get_text():
-                    cast_text = div.get_text(strip=True).split("主演:")[1].strip()
-                    break
+            # 提取电影详细信息
+            hover_info = item.find("div", class_="movie-item-hover")
+            if hover_info:
+                # 提取类型
+                type_text = "N/A"
+                for div in hover_info.find_all("div", class_="movie-hover-title"):
+                    if "类型:" in div.get_text():
+                        type_text = div.get_text(strip=True).split("类型:")[1].strip()
+                        break
 
-            # 提取上映日期
-            date_text = "N/A"
-            for div in hover_info.find_all("div", class_="movie-hover-title"):
-                if "上映时间:" in div.get_text():
-                    date_text = div.get_text(strip=True).split("上映时间:")[1].strip()
-                    break
+                # 提取主演
+                cast_text = "N/A"
+                for div in hover_info.find_all("div", class_="movie-hover-title"):
+                    if "主演:" in div.get_text():
+                        cast_text = div.get_text(strip=True).split("主演:")[1].strip()
+                        break
 
-            # print("类型:", type_text)
-            # print("主演:", cast_text)
-            # print("上映时间:", date_text)
-        else:
-            print("No hover_info found")
+                # 提取上映日期
+                date_text = "N/A"
+                for div in hover_info.find_all("div", class_="movie-hover-title"):
+                    if "上映时间:" in div.get_text():
+                        date_text = div.get_text(strip=True).split("上映时间:")[1].strip()
+                        break
 
-        # 提取图片 URL
-        image_tag = item.find("img", class_="movie-hover-img")
-        image_url = image_tag["src"].strip() if image_tag and "src" in image_tag.attrs else "N/A"
+            else:
+                type_text, cast_text, date_text = "N/A", "N/A", "N/A"
 
-        # 写入电影信息到 CSV 文件
-        csv_writer.writerow([title, rating, type_text, cast_text, date_text, image_url])
+            # 提取图片 URL
+            image_tag = item.find("img", class_="movie-hover-img")
+            image_url = image_tag["src"].strip() if image_tag and "src" in image_tag.attrs else "N/A"
 
-print("电影信息已写入到 movies.csv。")
+            # 写入电影信息到 CSV 文件
+            csv_writer.writerow([title, rating, type_text, cast_text, date_text, image_url])
 
-# 关闭浏览器
-browser.quit() 
+    print("电影信息已写入到 movies_my.csv。")
+
+    # 关闭浏览器
+    browser.quit()
+
+if __name__ == '__main__':
+    base_url = "https://www.maoyan.com/films"
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.130 Safari/537.36',
+        'Cookies': 'your_cookies_here',  # 这里需要填写实际的Cookies值
+        'Referer': 'https://passport.maoyan.com/'
+    }
+
+    # 创建 CSV 文件准备写入电影信息
+    with open("movies_my.csv", mode="w", newline="", encoding="utf-8") as file:
+        csv_writer = csv.writer(file)
+        # 写入CSV文件的标题行
+        csv_writer.writerow(["影片名称", "评分", "类型", "主演", "上映日期", "图片URL"])
+
+    # 遍历所有 yearId 和 offset
+    for year_id in range(1,2):  # yearId 从 1 到 24
+        for offset in range(0, 200, 30):  # offset 从 0 到 2000，步长为 30
+            url = f"{base_url}?yearId={year_id}&showType=3&offset={offset}"
+            # print(f"Fetching URL: {url}")
+            scrape_movies(url, headers)
