@@ -163,7 +163,7 @@ def scrape_movies(url, headers):
     movie_items = soup.find_all("div", class_="movie-item film-channel")
 
     # 打开CSV文件准备写入电影信息
-    with open("movies_my.csv", mode="a", newline="", encoding="utf-8") as file:
+    with open("movies_my(9_120).csv", mode="a", newline="", encoding="utf-8") as file:
         csv_writer = csv.writer(file)
         # 写入CSV文件的标题行
         csv_writer.writerow(["影片名称", "评分", "类型", "主演", "上映日期", "图片URL"])
@@ -211,7 +211,7 @@ def scrape_movies(url, headers):
             # 写入电影信息到 CSV 文件
             csv_writer.writerow([title, rating, type_text, cast_text, date_text, image_url])
 
-    print("电影信息已写入到 movies_my.csv。")
+    # print("电影信息已写入到 movies_my(9_120).csv。")
 
     # 关闭浏览器
     browser.quit()
@@ -225,14 +225,15 @@ if __name__ == '__main__':
     }
 
     # 创建 CSV 文件准备写入电影信息
-    with open("movies_my.csv", mode="w", newline="", encoding="utf-8") as file:
+    with open("movies_my(9_120).csv", mode="w", newline="", encoding="utf-8") as file:
         csv_writer = csv.writer(file)
         # 写入CSV文件的标题行
         csv_writer.writerow(["影片名称", "评分", "类型", "主演", "上映日期", "图片URL"])
 
     # 遍历所有 yearId 和 offset
-    for year_id in range(1,2):  # yearId 从 1 到 24
-        for offset in range(0, 200, 30):  # offset 从 0 到 2000，步长为 30
+    for year_id in range(1,25):  # yearId 从 1 到 24
+        for offset in range(0, 2000, 30):  # offset 从 0 到 2000，步长为 30
             url = f"{base_url}?yearId={year_id}&showType=3&offset={offset}"
             # print(f"Fetching URL: {url}")
             scrape_movies(url, headers)
+            print(f"已完成{year_id}——{offset}的爬取。")
