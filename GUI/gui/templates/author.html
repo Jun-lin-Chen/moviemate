@@ -58,7 +58,7 @@
     </div>
     <div class="container mb-4">
     	<img src="/static/assets/img/av.png" class="mt-neg100 mb-4 rounded-circle" width="128">
-    	<h1 class="font-weight-bold title">Sal</h1>
+    	<h1 class="font-weight-bold title">User Name</h1>
     	<p>
     		I love Art, Web Design, Photography, Design, Illustration.
     	</p>
@@ -305,7 +305,32 @@
     
         </div>
         
-    </footer>    
+    </footer>
+<script>
+	 document.addEventListener('DOMContentLoaded', function() {
+            // 创建一个新的 XMLHttpRequest 对象
+            var xhr = new XMLHttpRequest();
+            // 配置请求类型、URL 以及异步处理方式
+            xhr.open('GET', '/static/assets/userData/home.txt', true);
+            // 当请求完成时执行的函数
+            xhr.onload = function() {
+                if (this.status === 200) {
+                    // 读取响应文本，按行分割成数组
+                    var imageUrls = this.responseText.split('\n');
+                    // 获取所有 card-pin 元素
+                    var cards = document.querySelectorAll('.card-pin');
+                    // 将图片 URL 设置到 card-pin 的 img 元素上
+                    cards.forEach(function(card, index) {
+                        if (imageUrls[index]) { // 确保有对应的 URL
+                            card.querySelector('.card-img').src = imageUrls[index];
+                        }
+                    });
+                }
+            };
+            // 发送请求
+            xhr.send();
+        });
+</script>
 </body>
     
 </html>
