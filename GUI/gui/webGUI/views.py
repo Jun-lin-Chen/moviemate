@@ -29,9 +29,9 @@ def Login_view(request):
         if c:
             return HttpResponseRedirect('http://127.0.0.1:8000/dev/index/')
         else:
-            return HttpResponse('登录失败！')
+            return HttpResponse('Login failed！')
     else:
-        return HttpResponse('用户名或密码不能为空！')
+        return HttpResponse('Your user name or password should not be empty！')
 
 #注册界面
 def toRegister_view(request):
@@ -42,8 +42,13 @@ def register_view(request):
     u = request.POST.get('user', '')
     p = request.POST.get('password', '')
     if u and p:
-        stu = UserInfo(user_name=u, user_password=p)
-        stu.save()
-        return HttpResponse('注册成功!')
+        if UserInfo.objects.filter(user_name=u).exists():
+            return HttpResponse('This username is already taken. Please try another one.')
+        else:
+            stu = UserInfo(user_name=u, user_password=p)
+            stu.save()
+            # Pass a message to the template
+            message = 'Register successfully! Redirecting to login page in 2s...'
+            return render(request, 'register_success.html', {'message': message})
     else:
-        return HttpResponse('请重新输入！')
+        return HttpResponse('Please try again！')
