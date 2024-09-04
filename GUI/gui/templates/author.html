@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Author - MovieMate</title>
+	<link rel="icon" href="/static/assets/img/logo.png" type="image/png">
     <script type="text/javascript"> (function() { var css = document.createElement('link'); css.href = 'https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css'; css.rel = 'stylesheet'; css.type = 'text/css'; document.getElementsByTagName('head')[0].appendChild(css); })(); </script>
     <link rel="stylesheet" href="/static/assets/css/app.css">
     <link rel="stylesheet" href="/static/assets/css/theme.css">
@@ -15,7 +16,7 @@
 <body>
 
     <nav class="navbar navbar-expand-lg navbar-light bg-white fixed-top">
-    <a class="navbar-brand font-weight-bolder mr-3" href="index.html"><img src="/static/assets/img/logo.png"></a>
+    <a class="navbar-brand font-weight-bolder mr-3" href="/static/assets/img/img.png"><img src="/static/assets/img/logo.png"></a>
     <button class="navbar-light navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsDefault" aria-controls="navbarsDefault" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
     </button>
@@ -23,7 +24,8 @@
     	<ul class="navbar-nav mr-auto align-items-center">
     		<form class="bd-search hidden-sm-down">
     			<input type="text" class="form-control bg-graylight border-0 font-weight-bold" id="search-input" placeholder="Search..." autocomplete="off">
-    			<div class="dropdown-menu bd-search-results" id="search-results">
+    			<button type="submit" class="btn btn-link btn-sm" id="search-button">Enter</button>
+				<div class="dropdown-menu bd-search-results" id="search-results">
     			</div>
     		</form>
     	</ul>
@@ -329,6 +331,23 @@
             };
             // 发送请求
             xhr.send();
+                           // 获取搜索按钮
+        var searchButton = document.getElementById('search-button');
+
+        // 绑定点击事件
+        searchButton.addEventListener('click', function(event) {
+            // 阻止表单的默认提交行为
+            event.preventDefault();
+
+            // 获取输入框的值
+            var searchTerm = document.getElementById('search-input').value;
+
+            // 构建跳转的 URL
+<!--            var newUrl = 'https://example.com/search?query=' + encodeURIComponent(searchTerm);-->
+			var newUrl = 'http://127.0.0.1:8000/dev/post/'
+            // 跳转到指定网址
+            window.location.href = newUrl;
+        });
         });
 </script>
 </body>
