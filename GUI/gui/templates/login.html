@@ -3,14 +3,85 @@
 <head>
     <meta charset="UTF-8">
     <title>登录</title>
+    <style>
+        body {
+            background-color: #f2f2f2;
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        form {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        form:hover {
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+        p {
+            margin: 10px 0;
+        }
+        label {
+            font-size: 16px;
+            color: #333;
+            margin-right: 10px;
+        }
+        input[type="text"],
+        input[type="password"] {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 200px;
+            font-size: 14px;
+        }
+        input[type="submit"] {
+            background-color: #5cb85c;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+        input[type="submit"]:hover {
+            background-color: #4cae4c;
+        }
+        a {
+            color: #333;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
 <body>
-<form action='/dev/login/' method='post'>
-    {% csrf_token %}
-    <p><label>用户名：</label><input name="user"></p>
-    <p><label>密码：</label><input name="password"></p>
-    <input type="submit" value="提交">
-    <p><a href="{% url 'toregister' %}">没有账号？点击注册</a></p>
-</form>
+    <form action='/dev/login/' method='post'>
+        {% csrf_token %}
+        <p><label>用户名：</label><input name="user" type="text"></p>
+        <p><label>密码：</label><input name="password" type="password"></p>
+        <input type="submit" value="提交">
+        <p><a href="{% url 'toregister' %}">没有账号？点击注册</a></p>
+    </form>
+    <script>
+        // 动态特效
+        const inputs = document.querySelectorAll('input[type="text"], input[type="password"]');
+        inputs.forEach(input => {
+            input.addEventListener('focus', function() {
+                this.style.borderColor = '#5cb85c';
+            });
+            input.addEventListener('blur', function() {
+                this.style.borderColor = '#ddd';
+            });
+        });
+    </script>
 </body>
 </html>

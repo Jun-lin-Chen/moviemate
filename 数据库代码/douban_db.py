@@ -141,7 +141,7 @@ def main():
 
             create_douban_table(cursor)
 
-            file_path = r'D:\PythonProject\movie-reommendation-system\爬取网站代码\douban_top250.csv'
+            file_path = r'../爬取网站代码/douban_top250.csv'
             data = read_csv(file_path)
 
             delete_all_douban_data(cursor)
