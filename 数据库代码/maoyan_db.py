@@ -29,12 +29,23 @@ def create_maoyan_table(cursor):
         print('创建数据表时发生异常：', e)
         raise
 
+# def add_all_maoyan_data(cursor, data):
+#     try:
+#         sql = 'INSERT IGNORE INTO maoyan_movies(title, grade, genre, cast, release_date, image_url) VALUES(%s, %s, %s, %s, %s, %s)'
+#         cursor.executemany(sql, data)
+#         cursor.connection.commit()
+#         print(f"成功添加 {cursor.rowcount} 条数据。")
+#     except Exception as e:
+#         print('添加数据时发生异常：', e)
+#         raise
+
 def add_all_maoyan_data(cursor, data):
     try:
         sql = 'INSERT IGNORE INTO maoyan_movies(title, grade, genre, cast, release_date, image_url) VALUES(%s, %s, %s, %s, %s, %s)'
-        cursor.executemany(sql, data)
+        for row in data:
+            cursor.execute(sql, row)
         cursor.connection.commit()
-        print(f"成功添加 {cursor.rowcount} 条数据。")
+        print(f"成功添加 {len(data)} 条数据。")
     except Exception as e:
         print('添加数据时发生异常：', e)
         raise
@@ -65,7 +76,7 @@ def search_maoyan_data_by_title(cursor, title):
 # 读取csv文件
 def read_csv(file_path):
     try:
-        df = pd.read_csv(file_path, dtype=str)
+        df = pd.read_csv(file_path, dtype=str, encoding='utf-8')
         # 用一个空字符串替换所有的 nan 值
         df.fillna('', inplace=True)
         return [tuple(x) for x in df.values.tolist()]
@@ -79,7 +90,7 @@ def main():
     password = '123456'
     port = 3306
     database = 'moviemate'
-    charset = 'utf8'
+    charset = 'utf8mb4'
 
     try:
         connection = pymysql.connect(host=host, user=user, password=password, port=port, charset=charset)
@@ -91,6 +102,8 @@ def main():
 
             file_path = r'../爬取网站代码/movies_maoyan_merge.csv'
             data = read_csv(file_path)
+            print('数据长度',len(data))
+            print(data[:10])
 
             delete_all_maoyan_data(cursor)
             add_all_maoyan_data(cursor, data)
