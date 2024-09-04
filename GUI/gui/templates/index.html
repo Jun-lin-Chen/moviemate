@@ -23,8 +23,9 @@
     <div class="collapse navbar-collapse" id="navbarsDefault">
     	<ul class="navbar-nav mr-auto align-items-center">
     		<form class="bd-search hidden-sm-down">
-    			<input type="text" class="form-control bg-graylight border-0 font-weight-bold" id="search-input" placeholder="Search..." autocomplete="off">
-    			<div class="dropdown-menu bd-search-results" id="search-results">
+    			<input type="text" class="form-control bg-graylight border-0 font-weight-bold" id="search-input" placeholder="Search..." autocomplete="on">
+				<button type="submit" class="btn btn-link btn-sm" id="search-button">Enter</button>
+				<div class="dropdown-menu bd-search-results" id="search-results">
     			</div>
     		</form>
     	</ul>
@@ -287,6 +288,7 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+
         // 创建一个新的 XMLHttpRequest 对象
         var xhr = new XMLHttpRequest();
         // 配置请求类型、URL 以及异步处理方式
@@ -309,6 +311,7 @@
                             card.querySelector('.card-img').src = imageUrls[index];
                         }
                     });
+
                 } catch (e) {
                     console.error('Error parsing JSON!', e);
                 }
@@ -316,6 +319,26 @@
         };
         // 发送请求
         xhr.send();
+
+            // 获取搜索按钮
+        var searchButton = document.getElementById('search-button');
+
+        // 绑定点击事件
+        searchButton.addEventListener('click', function(event) {
+            // 阻止表单的默认提交行为
+            event.preventDefault();
+
+            // 获取输入框的值
+            var searchTerm = document.getElementById('search-input').value;
+
+            // 构建跳转的 URL
+<!--            var newUrl = 'https://example.com/search?query=' + encodeURIComponent(searchTerm);-->
+			var newUrl = 'http://127.0.0.1:8000/dev/post/'
+            // 跳转到指定网址
+            window.location.href = newUrl;
+<!--			window.location.reload(true);-->
+
+        });
     });
 </script>
 

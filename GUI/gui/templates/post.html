@@ -37,7 +37,8 @@
     	<ul class="navbar-nav mr-auto align-items-center">
     		<form class="bd-search hidden-sm-down">
     			<input type="text" class="form-control bg-graylight border-0 font-weight-bold" id="search-input" placeholder="Search..." autocomplete="off">
-    			<div class="dropdown-menu bd-search-results" id="search-results">
+				<button type="submit" class="btn btn-link btn-sm" id="search-button">Enter</button>
+				<div class="dropdown-menu bd-search-results" id="search-results">
     			</div>
     		</form>
     	</ul>
@@ -274,6 +275,7 @@
                             card.querySelector('.card-img').src = imageUrls[index];
                         }
                     });
+
                      var imageUrl = data.target.img;
                     // 更新图片元素
                     var cardImage = document.querySelector('.card-img-top');
@@ -283,7 +285,7 @@
                     var targetData = data.target;
                     // 获取列表元素
                     var list = document.getElementById('ingredients-list');
-					var keysToInclude = ['MM Rating', 'category', 'Star', 'Date'];
+					var keysToInclude = ['MM Rating', 'Category', 'Star', 'Date'];
 
                     // 遍历指定的键并添加到列表中
                     keysToInclude.forEach(function(key) {
@@ -293,11 +295,16 @@
                             list.appendChild(listItem);
                         }
                     });
+
                     var link = document.querySelector('.btn-gray200');
         			link.href = targetData['url']; // 将这里的 URL 替换为您想要设置的 URL
  					var heading = document.querySelector('.card-title.display-4');
 					// 设置新的文本内容
-					heading.textContent = targetData['name']; // 将这里的 '新标题' 替换为您想要设置的新文本
+					heading.textContent = targetData['Name']; // 将这里的 '新标题' 替换为您想要设置的新文本
+
+				 document.addEventListener('DOMContentLoaded', function() {
+
+    });
                 } catch (e) {
                     console.error('Error parsing JSON!', e);
                 }
@@ -305,6 +312,23 @@
         };
         // 发送请求
         xhr.send();
+               // 获取搜索按钮
+        var searchButton = document.getElementById('search-button');
+
+        // 绑定点击事件
+        searchButton.addEventListener('click', function(event) {
+            // 阻止表单的默认提交行为
+            event.preventDefault();
+
+            // 获取输入框的值
+            var searchTerm = document.getElementById('search-input').value;
+
+            // 构建跳转的 URL
+<!--            var newUrl = 'https://example.com/search?query=' + encodeURIComponent(searchTerm);-->
+			var newUrl = 'http://127.0.0.1:8000/dev/post/'
+            // 跳转到指定网址
+            window.location.href = newUrl;
+        });
     });
 </script>
 </body>

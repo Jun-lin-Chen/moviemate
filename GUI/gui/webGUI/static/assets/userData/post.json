@@ -1,10 +1,10 @@
 {
     "target":
         {
-            "Name": "aaa",
+            "Name": "Name",
             "img": "https://p0.pipi.cn/basicdata/54ecded78070e139dd8d33ebf7c3af1f46077.jpg?imageView2/1/w/218/h/300",
             "MM Rating":  8,
-            "category": "Romantics",
+            "Category": "Romantics",
             "Star":"Me",
             "Date": "2004-1-1",
             "url": "https://img9.doubanio.com/view/photo/l_ratio_poster/public/p2891977996.jpg"
