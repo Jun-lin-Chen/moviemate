@@ -5,11 +5,12 @@
     <title>登录</title>
 </head>
 <body>
-<form action='/polls/index/' method='post'>
+<form action='/dev/login/' method='post'>
     {% csrf_token %}
     <p><label>用户名：</label><input name="user"></p>
     <p><label>密码：</label><input name="password"></p>
     <input type="submit" value="提交">
+    <p><a href="{% url 'toregister' %}">没有账号？点击注册</a></p>
 </form>
 </body>
 </html>
