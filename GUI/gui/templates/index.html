@@ -46,7 +46,7 @@
     			<h4 class="dropdown-header display-4">Easter Egg !</h4>
     			<div class="dropdown-divider">
     			</div>
-    			<span class="dropdown-item"><a href="https://github.com/wowthemesnet/template-pintereso-bootstrap-html/archive/master.zip" class="btn btn-primary d-block"><i class="fa fa-child"></i> Try now</a></span>
+    			<span class="dropdown-item"><a href="https://movie-detectives.com/" class="btn btn-primary d-block"><i class="fa fa-child"></i> Try now</a></span>
     		</div>
     		</li>
     	</ul>
@@ -286,16 +286,21 @@
     </footer>
 
 <script>
-	 document.addEventListener('DOMContentLoaded', function() {
-            // 创建一个新的 XMLHttpRequest 对象
-            var xhr = new XMLHttpRequest();
-            // 配置请求类型、URL 以及异步处理方式
-            xhr.open('GET', '/static/assets/userData/home.txt', true);
-            // 当请求完成时执行的函数
-            xhr.onload = function() {
-                if (this.status === 200) {
-                    // 读取响应文本，按行分割成数组
-                    var imageUrls = this.responseText.split('\n');
+    document.addEventListener('DOMContentLoaded', function() {
+        // 创建一个新的 XMLHttpRequest 对象
+        var xhr = new XMLHttpRequest();
+        // 配置请求类型、URL 以及异步处理方式
+        xhr.open('GET', '/static/assets/userData/home.json', true);
+        // 设置请求头，指明接受 JSON 格式的响应
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        // 当请求完成时执行的函数
+        xhr.onload = function() {
+            if (this.status === 200) {
+                try {
+                    // 解析 JSON 响应文本
+                    var data = JSON.parse(this.responseText);
+                    // 假设 JSON 文件中有一个名为 imgurls 的数组
+                    var imageUrls = data.imgurls;
                     // 获取所有 card-pin 元素
                     var cards = document.querySelectorAll('.card-pin');
                     // 将图片 URL 设置到 card-pin 的 img 元素上
@@ -304,12 +309,16 @@
                             card.querySelector('.card-img').src = imageUrls[index];
                         }
                     });
+                } catch (e) {
+                    console.error('Error parsing JSON!', e);
                 }
-            };
-            // 发送请求
-            xhr.send();
-        });
+            }
+        };
+        // 发送请求
+        xhr.send();
+    });
 </script>
+
 
 </body>
 
