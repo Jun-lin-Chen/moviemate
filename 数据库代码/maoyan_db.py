@@ -1,19 +1,5 @@
-'''
-实现数据库的创建及管理（增删改查）
-注：运行之前需要在本地安装mysql
-'''
 import pymysql
 import pandas as pd
-
-# 连接数据库
-def database_connection(host, user, password, port, database, charset):
-    connection = None
-    try:
-        connection = pymysql.connect(host=host, user=user, password=password, port=port, db=database, charset=charset)
-        return connection
-    except Exception as e:
-        print('在连接数据库时发生异常：', e)
-        raise  # 重新抛出异常
 
 # 创建数据库
 def create_database(cursor, database):
@@ -25,17 +11,16 @@ def create_database(cursor, database):
         raise
 
 # 创建maoyan_movies数据表
-def create_maoyan_movies_table(cursor):
+def create_maoyan_table(cursor):
     try:
         sql = '''
         CREATE TABLE IF NOT EXISTS maoyan_movies (
             title VARCHAR(255) NOT NULL,
-            grade FLOAT,
-            genre VARCHAR(255),
-            cast VARCHAR(255),
-            release_date DATE,
-            image_url VARCHAR(255),
-            PRIMARY KEY (title)
+            grade VARCHAR(255) NOT NULL,
+            genre VARCHAR(255) NOT NULL,
+            cast VARCHAR(255) NOT NULL,
+            release_date VARCHAR(255) NOT NULL,
+            image_url VARCHAR(255) NOT NULL
         )
         '''
         cursor.execute(sql)
@@ -44,35 +29,48 @@ def create_maoyan_movies_table(cursor):
         print('创建数据表时发生异常：', e)
         raise
 
-def read_csv(file_path):
-    try:
-        # 读取 CSV 文件到 DataFrame
-        data = pd.read_csv(file_path)
-        # 替换 NaN 值为 None
-        data.fillna(value={'grade': None, 'genre': None, 'cast': None, 'release_date': None, 'image_url': None}, inplace=True)
-        # 将 DataFrame 转换为列表
-        return data.values.tolist()
-    except Exception as e:
-        print('读取CSV文件时发生异常：', e)
-        raise
-
 def add_all_maoyan_data(cursor, data):
     try:
-        sql = '''
-        INSERT INTO maoyan_movies (title, grade, genre, cast, release_date, image_url)
-        VALUES (%s, %s, %s, %s, %s, %s)
-        ON DUPLICATE KEY UPDATE
-        grade = VALUES(grade),
-        genre = VALUES(genre),
-        cast = VALUES(cast),
-        release_date = VALUES(release_date),
-        image_url = VALUES(image_url);
-        '''
+        sql = 'INSERT IGNORE INTO maoyan_movies(title, grade, genre, cast, release_date, image_url) VALUES(%s, %s, %s, %s, %s, %s)'
         cursor.executemany(sql, data)
         cursor.connection.commit()
         print(f"成功添加 {cursor.rowcount} 条数据。")
     except Exception as e:
-        print('添加所有数据时发生异常：', e)
+        print('添加数据时发生异常：', e)
+        raise
+
+def delete_all_maoyan_data(cursor):
+    try:
+        sql='TRUNCATE TABLE maoyan_movies'
+        cursor.execute(sql)
+        print('成功删除所有数据')
+    except Exception as e:
+        print(f'删除数据时出错{e}')
+
+# 通过电影名称查找单条数据
+def search_maoyan_data_by_title(cursor, title):
+    try:
+        sql = 'SELECT * FROM maoyan_movies WHERE title = %s'
+        cursor.execute(sql, (title,))
+        result = cursor.fetchone()
+        if result:
+            print("查询结果：", result)
+        else:
+            print("未找到匹配的数据。")
+        return result
+    except Exception as e:
+        print('查询数据库电影评分数据时发生异常：', e)
+        raise
+
+# 读取csv文件
+def read_csv(file_path):
+    try:
+        df = pd.read_csv(file_path, dtype=str)
+        # 用一个空字符串替换所有的 nan 值
+        df.fillna('', inplace=True)
+        return [tuple(x) for x in df.values.tolist()]
+    except Exception as e:
+        print('读取CSV文件时发生异常：', e)
         raise
 
 def main():
@@ -84,18 +82,26 @@ def main():
     charset = 'utf8'
 
     try:
-        with database_connection(host, user, password, port, database, charset) as connection:
-            with connection.cursor() as cursor:
-                create_database(cursor, database)
-                cursor.execute(f"USE {database}")
+        connection = pymysql.connect(host=host, user=user, password=password, port=port, charset=charset)
+        with connection.cursor() as cursor:
+            create_database(cursor, database)
+            cursor.execute(f"USE {database}")
 
-                create_maoyan_movies_table(cursor)
+            create_maoyan_table(cursor)
 
-                file_path = r'D:\PythonProject\MovieRecommendation\test\douban_top250.csv'
-                data = read_csv(file_path)
+            file_path = r'../爬取网站代码/movies_maoyan_merge.csv'
+            data = read_csv(file_path)
 
-                add_all_maoyan_data(cursor, data)
-                print("数据添加完成。")
+            delete_all_maoyan_data(cursor)
+            add_all_maoyan_data(cursor, data)
+            print("数据添加完成。")
+
+            print("准备查询数据...")
+            search_movie_title = input('请输入要查询的电影的名称：')
+            if search_movie_title.strip():
+                result = search_maoyan_data_by_title(cursor, search_movie_title)
+            else:
+                print("未输入有效的电影名称。")
 
     except Exception as e:
         print('在执行主函数main时发生异常：', e)
