@@ -1,6 +1,3 @@
-'''
-通过mysql实现douban数据的创建及管理（增删改查）
-'''
 import pymysql
 import pandas as pd
 
