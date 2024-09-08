@@ -21,13 +21,14 @@
     <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarsDefault">
-    	<ul class="navbar-nav mr-auto align-items-center">
-    		<form class="bd-search hidden-sm-down">
-    			<input type="text" class="form-control bg-graylight border-0 font-weight-bold" id="search-input" placeholder="Search..." autocomplete="off">
-    			<button type="submit" class="btn btn-link btn-sm" id="search-button">Enter</button>
-				<div class="dropdown-menu bd-search-results" id="search-results">
-    			</div>
-    		</form>
+    	    	<ul class="navbar-nav mr-auto align-items-center">
+			<div class="search-container">
+        <form action='/dev/index/' method='post' class="search-form">
+            {% csrf_token %}
+            <input type="text" name="search" placeholder="Search...">
+            <input type="submit" value="Search">
+        </form>
+    </div>
     	</ul>
     	<ul class="navbar-nav ml-auto align-items-center">
     		<li class="nav-item">
@@ -331,23 +332,23 @@
             };
             // 发送请求
             xhr.send();
-                           // 获取搜索按钮
-        var searchButton = document.getElementById('search-button');
+<!--                           // 获取搜索按钮-->
+<!--        var searchButton = document.getElementById('search-button');-->
 
-        // 绑定点击事件
-        searchButton.addEventListener('click', function(event) {
-            // 阻止表单的默认提交行为
-            event.preventDefault();
+<!--        // 绑定点击事件-->
+<!--        searchButton.addEventListener('click', function(event) {-->
+<!--            // 阻止表单的默认提交行为-->
+<!--            event.preventDefault();-->
 
-            // 获取输入框的值
-            var searchTerm = document.getElementById('search-input').value;
+<!--            // 获取输入框的值-->
+<!--            var searchTerm = document.getElementById('search-input').value;-->
 
-            // 构建跳转的 URL
-<!--            var newUrl = 'https://example.com/search?query=' + encodeURIComponent(searchTerm);-->
-			var newUrl = 'http://127.0.0.1:8000/dev/post/'
-            // 跳转到指定网址
-            window.location.href = newUrl;
-        });
+<!--            // 构建跳转的 URL-->
+<!--&lt;!&ndash;            var newUrl = 'https://example.com/search?query=' + encodeURIComponent(searchTerm);&ndash;&gt;-->
+<!--			var newUrl = 'http://127.0.0.1:8000/dev/post/'-->
+<!--            // 跳转到指定网址-->
+<!--            window.location.href = newUrl;-->
+<!--        });-->
         });
 </script>
 </body>
