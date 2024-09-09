@@ -12,10 +12,57 @@
     <link rel="stylesheet" href="/static/assets/css/app.css">
 
     <link rel="stylesheet" href="/static/assets/css/theme.css">
-    <!-- 引入Bootstrap CSS -->
-<!--    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">-->
-    <!-- 可选的Bootstrap主题文件（一般不用引入） -->
-<!--    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap-theme.min.css">-->
+	    <style>
+        /* 导航栏样式 */
+        .navbar-collapse {
+            padding: 0 15px;
+        }
+        .navbar-nav {
+            display: flex;
+            align-items: center;
+        }
+        /* 搜索框容器样式 */
+        .search-container {
+            position: relative;
+            margin-right: 20px;
+        }
+        .search-form {
+            display: flex;
+            align-items: center;
+            border: 1px solid #ddd;
+            border-radius: 25px;
+            overflow: hidden;
+        }
+        .search-form input[type="text"] {
+            flex: 1;
+            padding: 10px 15px;
+            border: none;
+            outline: none;
+            font-size: 16px;
+        }
+        .search-form input[type="submit"] {
+            background-color:  #e99;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 25px;
+            transition: background-color 0.3s ease;
+        }
+        .search-form input[type="submit"]:hover {
+            background-color: #d88;
+        }
+        /* 搜索图标样式 */
+        .search-icon {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #aaa;
+            font-size: 20px;
+        }
+    </style>
 </head>
 
 </head>
@@ -30,13 +77,16 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarsDefault">
     	<ul class="navbar-nav mr-auto align-items-center">
-			<div class="search-container">
-        <form action='/dev/index/' method='post' class="search-form">
-            {% csrf_token %}
-            <input type="text" name="search" placeholder="Search...">
-            <input type="submit" value="Search">
-        </form>
-    </div>
+		 <li class="nav-item">
+                <div class="search-container">
+                    <form action='/dev/index/' method='post' class="search-form">
+                        {% csrf_token %}
+                        <i class="search-icon fas fa-search"></i>
+                        <input type="text" name="search" placeholder="Search..." required>
+                        <input type="submit" value="Search">
+                    </form>
+                </div>
+            </li>
     	</ul>
     	<ul class="navbar-nav ml-auto align-items-center">
     		<li class="nav-item">
@@ -61,6 +111,8 @@
     		</li>
     	</ul>
     </div>
+	<script src="https://kit.fontawesome.com/a076d05399.js"></script>
+
     </nav>
     <main role="main">
 
@@ -286,7 +338,7 @@
               https://www.wowthemes.net/freebies-license/
             -->
           <p>©  <span class="credits font-weight-bold">
-            <a target="_blank" class="text-dark" href="https://ttiannaitt.github.io/"><u>MovieMate Website GUI</u> by Yukun Tian (TTiannaiTT)</a>
+            <a target="_blank" class="text-dark" href="https://ttiannaitt.github.io/">MovieMate Website GUI by <u>Yukun Tian</u></a>
           </span>
           </p>
 
