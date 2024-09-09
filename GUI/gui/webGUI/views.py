@@ -93,6 +93,11 @@ def index_view(request):
                 with connection.cursor() as cursor:
                     results = search_douban_data_by_title(cursor, question)
                     print(f'index-results:{results}')
+                    categorys = results['Category']
+                    #搜索电影的类别
+                    category = categorys.split('/')[0]
+                    print(f'category{category}')
+                    best_movies_url = best_10_movies_by_genre(cursor, category)
                     if results:
                         # 读取现有的JSON文件
                         with open(r'D:\PythonProject\moviemate\movie-reommendation-system\GUI\gui\webGUI\static\assets\userData\post.json','r', encoding='utf-8') as file:
@@ -100,6 +105,7 @@ def index_view(request):
                         if data:
                             # 更新target字段
                             data['target'] = results
+                            data['imgurls'] = best_movies_url
                         else:
                             return HttpResponse('data is empty')
                         # 将更新后的数据写回到JSON文件
@@ -133,3 +139,39 @@ def post_view(request):
     response['Pragma'] = 'no-cache'
     response['Expires'] = '0'
     return response
+
+def best_10_movies_by_genre(cursor, genre):
+    try:
+        # 编写SQL查询语句，按评分降序排列，同时筛选特定类别,因为重复太多了，限制的数量可以适当增加，现在选的是300
+        sql = f'SELECT title, rating, poster_url FROM douban_movies WHERE genre LIKE %s ORDER BY rating DESC LIMIT 300'
+        # 执行SQL查询，传入类别参数
+        cursor.execute(sql, ('%' + genre + '%',))
+        # 获取查询结果
+        results = cursor.fetchall()
+        # 处理结果
+        best_movies = []
+        for row in results:
+            movie_name, rating, poster_url = row
+            best_movies.append({
+                'title': movie_name,
+                'rating': rating,
+                'poster_url': poster_url
+            })
+        print(best_movies)
+
+        best_movies_poster_url = []
+
+        #防止重复
+        for movie in best_movies:
+            poster_url = movie['poster_url']
+            if poster_url not in best_movies_poster_url:
+                best_movies_poster_url.append(poster_url)
+
+        best_10_movies_poster_url = best_movies_poster_url[:10]
+        # 返回结果
+        print(f'best_10_movies_url:{best_10_movies_poster_url}')
+        return best_10_movies_poster_url
+    except Exception as e:
+        # 打印异常信息
+        print(f'查找类别为 {genre} 的评分最高的10部电影时发生错误: {e}')
+        return None
