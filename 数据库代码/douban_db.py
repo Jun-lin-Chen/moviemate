@@ -113,7 +113,7 @@ def best_100_movies(cursor):
         # 打印异常信息
         print(f'查找15名评分最高的电影时发生错误: {e}')
 
-def best_15_movies_by_genre(cursor, genre):
+def best_100_movies_by_genre(cursor, genre):
     try:
         # 编写SQL查询语句，按评分降序排列，并限制结果为前15条，同时筛选特定类别
         sql = f'SELECT title, rating, poster_url FROM douban_movies WHERE genre LIKE %s ORDER BY rating DESC LIMIT 100'
@@ -151,11 +151,30 @@ def main():
         connection = pymysql.connect(host=host, user=user, password=password, port=port, database=database, charset=charset)
         with connection.cursor() as cursor:
             #评分最高的某一类别电影
-            best_15_movies_by_genre(cursor, '剧情')
-            print(best_15_movies_by_genre())
+            genre = '科幻'
+            best_movies = best_100_movies_by_genre(cursor, genre)
+            print(best_movies)
+            best_100_movies_poster_url = []
+            for movie in best_movies:
+                poster_url = movie['poster_url']
+                if poster_url not in best_100_movies_poster_url:
+                    best_100_movies_poster_url.append(poster_url)
+            best_15_movies_poster_url = []
+            for i in range(15):
+                best_15_movies_poster_url.append(best_100_movies_poster_url[i])
+            # 读取现有的JSON文件
+            with open(r'D:\PythonProject\moviemate\movie-reommendation-system\GUI\gui\webGUI\static\assets\userData\post.json','r', encoding='utf-8') as file:
+                data = json.load(file)
+            if data:
+                # 更新imgurls字段
+                data['imgurls'] = best_15_movies_poster_url
+            # 将更新后的数据写回到JSON文件
+            with open(r'D:\PythonProject\moviemate\movie-reommendation-system\GUI\gui\webGUI\static\assets\userData\post.json','w', encoding='utf-8') as file:
+                json.dump(data, file, ensure_ascii=False, indent=4)
 
 
-            # #评分最高的50部电影
+
+            # #评分最高的100部电影
             # best_movies = best_100_movies(cursor)
             # best_100_movies_poster_url = []
             # for movie in best_movies:
