@@ -89,18 +89,11 @@ def read_excel(file_path):
         print('读取Excel文件时发生异常：', e)
         raise
 
-def best_15_movies(cursor):
-    try:
-        sql = ''
-        cursor.execute(sql)
-    except  Exception as e:
-        print(f'查找15名评分最高的电影:{e}')
 
-
-def best_15_movies(cursor):
+def best_100_movies(cursor):
     try:
         # 编写SQL查询语句，按评分降序排列，并限制结果为前15条
-        sql = 'SELECT title, rating, poster_url FROM douban_movies ORDER BY rating DESC LIMIT 15'
+        sql = 'SELECT title, rating, poster_url FROM douban_movies ORDER BY rating DESC LIMIT 100'
         # 执行SQL查询
         cursor.execute(sql)
         # 获取查询结果
@@ -116,10 +109,35 @@ def best_15_movies(cursor):
             })
         # 返回结果
         return best_movies
-
     except Exception as e:
         # 打印异常信息
         print(f'查找15名评分最高的电影时发生错误: {e}')
+
+def best_15_movies_by_genre(cursor, genre):
+    try:
+        # 编写SQL查询语句，按评分降序排列，并限制结果为前15条，同时筛选特定类别
+        sql = f'SELECT title, rating, poster_url FROM douban_movies WHERE genre LIKE %s ORDER BY rating DESC LIMIT 100'
+        # 执行SQL查询，传入类别参数
+        cursor.execute(sql, (genre,))
+        # 获取查询结果
+        results = cursor.fetchall()
+        # 处理结果
+        best_movies = []
+        for row in results:
+            movie_name, rating, poster_url = row
+            best_movies.append({
+                'title': movie_name,
+                'rating': rating,
+                'poster_url': poster_url
+            })
+        # 返回结果
+        return best_movies
+    except Exception as e:
+        # 打印异常信息
+        print(f'查找类别为 {genre} 的评分最高的15部电影时发生错误: {e}')
+        return None
+
+
 
 def main():
     host = 'localhost'
@@ -132,26 +150,34 @@ def main():
     try:
         connection = pymysql.connect(host=host, user=user, password=password, port=port, database=database, charset=charset)
         with connection.cursor() as cursor:
-            #评分最高的15部电影
-            best_movies = best_15_movies(cursor)
-            best_movies_poster_url = []
-            for i in range(15):
-                best_movies_poster_url.append(best_movies[i]['poster_url'])
-            print(len(best_movies_poster_url))
+            #评分最高的某一类别电影
+            best_15_movies_by_genre(cursor, '剧情')
+            print(best_15_movies_by_genre())
 
-            # 读取现有的JSON文件
-            with open(r'D:\PythonProject\moviemate\movie-reommendation-system\GUI\gui\webGUI\static\assets\userData\home.json','r', encoding='utf-8') as file:
-                data = json.load(file)
-                print(len(data))
-            if data:
-                # 更新target字段
-                data['imgurls'] = best_movies_poster_url
 
-            # 将更新后的数据写回到JSON文件
-            with open(
-                    r'D:\PythonProject\moviemate\movie-reommendation-system\GUI\gui\webGUI\static\assets\userData\home.json',
-                    'w', encoding='utf-8') as file:
-                json.dump(data, file, ensure_ascii=False, indent=4)
+            # #评分最高的50部电影
+            # best_movies = best_100_movies(cursor)
+            # best_100_movies_poster_url = []
+            # for movie in best_movies:
+            #     poster_url = movie['poster_url']
+            #     if poster_url not in best_100_movies_poster_url:
+            #         best_100_movies_poster_url.append(poster_url)
+            #
+            # print(best_100_movies_poster_url)
+            #
+            # best_15_movies_poster_url = []
+            # for i in range(15):
+            #     best_15_movies_poster_url.append(best_100_movies_poster_url[i])
+            #
+            # # 读取现有的JSON文件
+            # with open(r'D:\PythonProject\moviemate\movie-reommendation-system\GUI\gui\webGUI\static\assets\userData\home.json','r', encoding='utf-8') as file:
+            #     data = json.load(file)
+            # if data:
+            #     # 更新imgurls字段
+            #     data['imgurls'] = best_15_movies_poster_url
+            # # 将更新后的数据写回到JSON文件
+            # with open(r'D:\PythonProject\moviemate\movie-reommendation-system\GUI\gui\webGUI\static\assets\userData\home.json','w', encoding='utf-8') as file:
+            #     json.dump(data, file, ensure_ascii=False, indent=4)
 
             # create_database(cursor, database)
             # cursor.execute(f"USE {database}")
