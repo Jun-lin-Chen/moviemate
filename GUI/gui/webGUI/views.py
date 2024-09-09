@@ -14,10 +14,11 @@ def helloworld(request):  # request是必须带的实例。类似class下方法�
 #
 #     return render(request, 'index.html')
 
-def search_single_douban_data_by_title(cursor, title):
+def search_douban_data_by_title(cursor, title):
     try:
-        sql = 'SELECT * FROM douban_movies WHERE title = %s'
-        cursor.execute(sql, (title,))
+        sql = 'SELECT * FROM douban_movies WHERE title LIKE %s'
+        # cursor.execute(sql, (title,))
+        cursor.execute(sql, ('%' + title + '%',))
         result = cursor.fetchone()
         results = {
             'Name': result[6],
@@ -30,7 +31,7 @@ def search_single_douban_data_by_title(cursor, title):
         }
         return results
     except Exception as e:
-        print('查询数据库电影评分数据时发生异常：', e)
+        print('查询douban电影数据库时发生异常：', e)
         raise
 
 def author_view(request):
@@ -89,7 +90,7 @@ def index_view(request):
             connection = pymysql.connect(host=host, user=user, password=password, port=port, charset=charset, database=database)
             if connection:
                 with connection.cursor() as cursor:
-                    results = search_single_douban_data_by_title(cursor, question)
+                    results = search_douban_data_by_title(cursor, question)
                     print(f'index-results:{results}')
                     if results:
                         # 读取现有的JSON文件
