@@ -8,11 +8,11 @@ import json, pymysql
 def helloworld(request):  # request是必须带的实例。类似class下方法必须带self一样
     return HttpResponse("Hello World!!")  # 通过HttpResponse模块直接返回字符串到前端页面
 
-def index_view(request):
-    question = request.POST.get('search', '')
-    print(f'question: {question}')
-
-    return render(request, 'index.html')
+# def index_view(request):
+#     question = request.POST.get('search', '')
+#     print(f'question: {question}')
+#
+#     return render(request, 'index.html')
 
 def search_single_douban_data_by_title(cursor, title):
     try:
@@ -32,60 +32,6 @@ def search_single_douban_data_by_title(cursor, title):
     except Exception as e:
         print('查询数据库电影评分数据时发生异常：', e)
         raise
-
-def post_view(request):
-    # 搜索的电影
-    question = request.GET.get('search-item', '') # 有问题！
-    # question = '少年的你'
-    print(f'question: {question}')
-    host = 'localhost'
-    user = 'root'
-    password = '123456'
-    port = 3306
-    database = 'MovieMate'
-    charset = 'utf8'
-    response = None  # 初始化response对象
-    if question:
-        try:
-            connection = pymysql.connect(host=host, user=user, password=password, port=port, charset=charset,
-                                         database=database)
-            if connection:
-                with connection.cursor() as cursor:
-                    results = search_single_douban_data_by_title(cursor, question)
-                    if results:
-                        # 读取现有的JSON文件
-                        with open(r'D:\PythonProject\movie-reommendation-system\GUI\gui\webGUI\static\assets\userData\post.json', 'r', encoding='utf-8') as file:
-                            data = json.load(file)
-
-                        if data:
-                            # 更新target字段
-                            data['target'] = results
-
-                        else:
-                            return HttpResponse('data is empty')
-
-                        # 将更新后的数据写回到JSON文件
-                        with open(r'D:\PythonProject\movie-reommendation-system\GUI\gui\webGUI\static\assets\userData\post.json', 'w', encoding='utf-8') as file:
-                            json.dump(data, file, ensure_ascii=False, indent=4)
-
-                        # 渲染模板
-                        response = render(request, 'post.html')
-                        response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
-                        response['Pragma'] = 'no-cache'
-                        response['Expires'] = '0'
-                    else:
-                        return HttpResponse('No matched movies')
-            else:
-                return HttpResponse('Database connection failed')
-        except Exception as e:
-            print(e)
-            response = HttpResponse(f"An error occurred: {e}")
-        finally:
-            if connection:
-                connection.close()  # 确保在最后关闭数据库连接
-            return response
-    else:
-        return render(request, 'post.html')
 
 def author_view(request):
     return render(request, 'author.html')
@@ -128,3 +74,60 @@ def register_view(request):
             return render(request, 'register_success.html', {'message': message})
     else:
         return HttpResponse('Please try again！')
+
+def index_view(request):
+    question = request.POST.get('search', '')
+    print(f'index-question: {question}')
+    host = 'localhost'
+    user = 'root'
+    password = '123456'
+    port = 3306
+    database = 'MovieMate'
+    charset = 'utf8'
+    if question:
+        try:
+            connection = pymysql.connect(host=host, user=user, password=password, port=port, charset=charset, database=database)
+            if connection:
+                with connection.cursor() as cursor:
+                    results = search_single_douban_data_by_title(cursor, question)
+                    print(f'index-results:{results}')
+                    if results:
+                        # 读取现有的JSON文件
+                        with open(r'D:\PythonProject\moviemate\movie-reommendation-system\GUI\gui\webGUI\static\assets\userData\post.json','r', encoding='utf-8') as file:
+                            data = json.load(file)
+                        if data:
+                            # 更新target字段
+                            data['target'] = results
+                        else:
+                            return HttpResponse('data is empty')
+                        # 将更新后的数据写回到JSON文件
+                        with open(r'D:\PythonProject\moviemate\movie-reommendation-system\GUI\gui\webGUI\static\assets\userData\post.json','w', encoding='utf-8') as file:
+                            json.dump(data, file, ensure_ascii=False, indent=4)
+                        # 渲染模板
+                        response = render(request, 'post.html')
+                        response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+                        response['Pragma'] = 'no-cache'
+                        response['Expires'] = '0'
+                        return response
+                    else:
+                        return HttpResponse('No matched movies')
+            else:
+                return HttpResponse('Database connection failed')
+        except Exception as e:
+            print(e)
+            return HttpResponse(f"An error occurred: {e}")
+        finally:
+            if connection:
+                connection.close()  # 确保在最后关闭数据库连接
+    else:
+        return render(request, 'index.html')
+
+def post_view(request):
+    # 搜索的电影
+    question = request.GET.get('search', '')
+    print(f'post-question: {question}')
+    response = render(request, 'post.html')
+    response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    response['Pragma'] = 'no-cache'
+    response['Expires'] = '0'
+    return response
