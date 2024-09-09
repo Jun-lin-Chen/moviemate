@@ -1,3 +1,5 @@
+import json
+
 import pymysql
 import pandas as pd
 
@@ -87,6 +89,38 @@ def read_excel(file_path):
         print('读取Excel文件时发生异常：', e)
         raise
 
+def best_15_movies(cursor):
+    try:
+        sql = ''
+        cursor.execute(sql)
+    except  Exception as e:
+        print(f'查找15名评分最高的电影:{e}')
+
+
+def best_15_movies(cursor):
+    try:
+        # 编写SQL查询语句，按评分降序排列，并限制结果为前15条
+        sql = 'SELECT title, rating, poster_url FROM douban_movies ORDER BY rating DESC LIMIT 15'
+        # 执行SQL查询
+        cursor.execute(sql)
+        # 获取查询结果
+        results = cursor.fetchall()
+        # 处理结果
+        best_movies = []
+        for row in results:
+            movie_name, rating, poster_url = row
+            best_movies.append({
+                'title': movie_name,
+                'rating': rating,
+                'poster_url': poster_url
+            })
+        # 返回结果
+        return best_movies
+
+    except Exception as e:
+        # 打印异常信息
+        print(f'查找15名评分最高的电影时发生错误: {e}')
+
 def main():
     host = 'localhost'
     user = 'root'
@@ -96,28 +130,49 @@ def main():
     charset = 'utf8'
 
     try:
-        connection = pymysql.connect(host=host, user=user, password=password, port=port, charset=charset)
+        connection = pymysql.connect(host=host, user=user, password=password, port=port, database=database, charset=charset)
         with connection.cursor() as cursor:
-            create_database(cursor, database)
-            cursor.execute(f"USE {database}")
+            #评分最高的15部电影
+            best_movies = best_15_movies(cursor)
+            best_movies_poster_url = []
+            for i in range(15):
+                best_movies_poster_url.append(best_movies[i]['poster_url'])
+            print(len(best_movies_poster_url))
 
-            create_douban_table(cursor)
+            # 读取现有的JSON文件
+            with open(r'D:\PythonProject\moviemate\movie-reommendation-system\GUI\gui\webGUI\static\assets\userData\home.json','r', encoding='utf-8') as file:
+                data = json.load(file)
+                print(len(data))
+            if data:
+                # 更新target字段
+                data['imgurls'] = best_movies_poster_url
 
-            file_path = r'../爬取网站代码/豆瓣电影.xlsx'
-            data = read_excel(file_path)
+            # 将更新后的数据写回到JSON文件
+            with open(
+                    r'D:\PythonProject\moviemate\movie-reommendation-system\GUI\gui\webGUI\static\assets\userData\home.json',
+                    'w', encoding='utf-8') as file:
+                json.dump(data, file, ensure_ascii=False, indent=4)
 
-            print('数据长度', len(data))
-
-            #delete_all_douban_data(cursor)
-            add_all_douban_data(cursor, data)
-            print("数据添加完成。")
-
-            print("准备查询数据...")
-            search_movie_title = input('请输入要查询的电影的名称：')
-            if search_movie_title.strip():
-                result = search_single_douban_data_by_title(cursor, search_movie_title)
-            else:
-                print("未输入有效的电影名称。")
+            # create_database(cursor, database)
+            # cursor.execute(f"USE {database}")
+            #
+            # create_douban_table(cursor)
+            #
+            # file_path = r'../爬取网站代码/豆瓣电影.xlsx'
+            # data = read_excel(file_path)
+            #
+            # print('数据长度', len(data))
+            #
+            # #delete_all_douban_data(cursor)
+            # add_all_douban_data(cursor, data)
+            # print("数据添加完成。")
+            #
+            # print("准备查询数据...")
+            # search_movie_title = input('请输入要查询的电影的名称：')
+            # if search_movie_title.strip():
+            #     result = search_single_douban_data_by_title(cursor, search_movie_title)
+            # else:
+            #     print("未输入有效的电影名称。")
 
     except Exception as e:
         print('在执行主函数main时发生异常：', e)
@@ -127,3 +182,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+

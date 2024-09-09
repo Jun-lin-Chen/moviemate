@@ -88,6 +88,7 @@ def index_view(request):
     if question:
         try:
             connection = pymysql.connect(host=host, user=user, password=password, port=port, charset=charset, database=database)
+            print({f'connection:{connection}'})
             if connection:
                 with connection.cursor() as cursor:
                     results = search_douban_data_by_title(cursor, question)
