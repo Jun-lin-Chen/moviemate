@@ -1,0 +1,14 @@
+{
+    "target": {
+        "user_name": "moviemate",
+        "user-password": "123456"
+    },
+    "imgurls": [
+        "https://movie.douban.com/subject/1291546/",
+        "https://movie.douban.com/subject/1853621/",
+        "https://movie.douban.com/subject/1295644/",
+        "https://movie.douban.com/subject/1291560/",
+        "https://movie.douban.com/subject/1292052/",
+        "https://movie.douban.com/subject/1777612/"
+    ]
+}

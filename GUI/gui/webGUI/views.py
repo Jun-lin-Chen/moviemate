@@ -46,8 +46,19 @@ def Login_view(request):
 
     u = request.POST.get('user','')
     p = request.POST.get('password','')
-
     if u and p :
+        info = {
+            "user_name": u,
+            "user-password": p
+        }
+        with open(r'D:\PythonProject\moviemate\movie-reommendation-system\GUI\gui\webGUI\static\assets\userData\author.json', 'r', encoding='utf-8') as file:
+            data = json.load(file)
+        if data:
+            # 更新author.json的target
+            data['target'] = info
+        with open(r'D:\PythonProject\moviemate\movie-reommendation-system\GUI\gui\webGUI\static\assets\userData\author.json','w', encoding='utf-8') as file:
+            json.dump(data, file, ensure_ascii=False, indent=4)
+
         c = UserInfo.objects.filter(user_name=u, user_password=p).count()
         if c:
             return HttpResponseRedirect('http://127.0.0.1:8000/dev/index/')
@@ -85,33 +96,41 @@ def index_view(request):
     port = 3306
     database = 'MovieMate'
     charset = 'utf8'
+
     if question:
         try:
             connection = pymysql.connect(host=host, user=user, password=password, port=port, charset=charset, database=database)
             print({f'connection:{connection}'})
             if connection:
                 with connection.cursor() as cursor:
+                    #搜索到的电影信息
                     results = search_douban_data_by_title(cursor, question)
-                    print(f'index-results:{results}')
-                    categorys = results['Category']
-                    #搜索电影的类别
-                    category = categorys.split('/')[0]
+                    # 搜索电影的类别
+                    category = results['Category'].split('/')[0]
                     print(f'category{category}')
+                    #同类别评分最高的十部电影
                     best_movies_url = best_10_movies_by_genre(cursor, category)
                     if results:
-                        # 读取现有的JSON文件
+                        with open(r'D:\PythonProject\moviemate\movie-reommendation-system\GUI\gui\webGUI\static\assets\userData\author.json','r', encoding='utf-8') as file:
+                            data = json.load(file)
+                        if data:
+                            #更新author.json的imgurls
+                            data['imgurls'].append(results['url'])
+                        else:
+                            return HttpResponse('data is empty')
+                        with open(r'D:\PythonProject\moviemate\movie-reommendation-system\GUI\gui\webGUI\static\assets\userData\author.json','w', encoding='utf-8') as file:
+                            json.dump(data, file, ensure_ascii=False, indent=4)
                         with open(r'D:\PythonProject\moviemate\movie-reommendation-system\GUI\gui\webGUI\static\assets\userData\post.json','r', encoding='utf-8') as file:
                             data = json.load(file)
                         if data:
-                            # 更新target字段
+                            # 更新post.json的target和imgurls
                             data['target'] = results
                             data['imgurls'] = best_movies_url
                         else:
                             return HttpResponse('data is empty')
-                        # 将更新后的数据写回到JSON文件
                         with open(r'D:\PythonProject\moviemate\movie-reommendation-system\GUI\gui\webGUI\static\assets\userData\post.json','w', encoding='utf-8') as file:
                             json.dump(data, file, ensure_ascii=False, indent=4)
-                        # 渲染模板
+                        # 处理浏览器缓存
                         response = render(request, 'post.html')
                         response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
                         response['Pragma'] = 'no-cache'
@@ -148,7 +167,6 @@ def best_10_movies_by_genre(cursor, genre):
         cursor.execute(sql, ('%' + genre + '%',))
         # 获取查询结果
         results = cursor.fetchall()
-        # 处理结果
         best_movies = []
         for row in results:
             movie_name, rating, poster_url = row
@@ -157,19 +175,13 @@ def best_10_movies_by_genre(cursor, genre):
                 'rating': rating,
                 'poster_url': poster_url
             })
-        print(best_movies)
-
         best_movies_poster_url = []
-
         #防止重复
         for movie in best_movies:
             poster_url = movie['poster_url']
             if poster_url not in best_movies_poster_url:
                 best_movies_poster_url.append(poster_url)
-
         best_10_movies_poster_url = best_movies_poster_url[:10]
-        # 返回结果
-        print(f'best_10_movies_url:{best_10_movies_poster_url}')
         return best_10_movies_poster_url
     except Exception as e:
         # 打印异常信息
