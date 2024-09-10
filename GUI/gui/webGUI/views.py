@@ -5,6 +5,13 @@ from django.shortcuts import HttpResponse  # 导入HttpResponse模块
 from .models import UserInfo
 import json, pymysql
 
+import requests
+import base64
+import hashlib
+import time
+from sparkai.llm.llm import ChatSparkLLM, ChunkPrintHandler
+from sparkai.core.messages import ChatMessage
+
 def helloworld(request):  # request是必须带的实例。类似class下方法必须带self一样
     return HttpResponse("Hello World!!")  # 通过HttpResponse模块直接返回字符串到前端页面
 
@@ -187,3 +194,57 @@ def best_10_movies_by_genre(cursor, genre):
         # 打印异常信息
         print(f'查找类别为 {genre} 的评分最高的10部电影时发生错误: {e}')
         return None
+
+from django.http import JsonResponse
+import requests
+
+
+def get_bot_response(message):
+    # 这里替换为你的讯飞API密钥和相关的参数
+    API_KEY = '679684f5a7086dd84ff413486042687b'
+    URL = 'https://openapi.xfyun.cn/v2/aiui'  # 讯飞开放平台API的URL
+    APPID = '1fd7ab4e'  # 替换为你的讯飞应用ID
+
+    # 构建请求到科大讯飞API的参数
+    body = {
+        "header": {
+            "app_id": APPID,
+            "status": 2
+        },
+        "parameter": {
+            "scene": "main",
+            "auth_id": "your_auth_id",  # 替换为你的auth_id
+            "data_type": "text",
+            "sample_rate": "16000",
+            "text": message
+        }
+    }
+
+    # 设置请求头
+    headers = {
+        'Content-Type': 'application/json',
+        'X-Appid': APPID,
+        'X-CurTime': str(int(time.time())),
+        'X-Param': base64.b64encode(json.dumps(body["parameter"]).replace(' ', '').encode('utf-8')).decode('utf-8'),
+        'X-CheckSum': hashlib.md5((API_KEY + str(int(time.time())) + base64.b64encode(
+            json.dumps(body["parameter"]).replace(' ', '').encode('utf-8'))).encode('utf-8')).hexdigest()
+    }
+
+    # 发送请求
+    response = requests.post(URL, headers=headers, data=json.dumps(body))
+
+    if response.status_code == 200:
+        result = response.json()
+        if result['code'] == '00000':  # 根据讯飞API文档，'00000'通常表示成功
+            return result['data']['answer']['text']
+        else:
+            return "对不起，讯飞API返回错误：" + result['desc']
+    else:
+        return "对不起，请求失败，状态码：" + str(response.status_code)
+
+def quiz_view(request):
+    if request.method == 'POST':
+        message = request.POST.get('message', '')
+        bot_response = get_bot_response(message)
+        return JsonResponse({'message': bot_response, 'sender': 'bot'})
+    return render(request, 'quiz.html') #返回渲染好的login界面

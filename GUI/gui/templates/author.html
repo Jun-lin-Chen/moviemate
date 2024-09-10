@@ -328,8 +328,8 @@
         
     </main>
 
-    <script src="assets/js/app.js"></script>
-    <script src="assets/js/theme.js"></script>
+    <script src="/static/assets/js/app.js"></script>
+    <script src="/static/assets/js/theme.js"></script>
     
     <footer class="footer pt-5 pb-5 text-center">
         
@@ -363,16 +363,21 @@
         
     </footer>
 <script>
-	 document.addEventListener('DOMContentLoaded', function() {
-            // 创建一个新的 XMLHttpRequest 对象
-            var xhr = new XMLHttpRequest();
-            // 配置请求类型、URL 以及异步处理方式
-            xhr.open('GET', '/static/assets/userData/home.txt', true);
-            // 当请求完成时执行的函数
-            xhr.onload = function() {
-                if (this.status === 200) {
-                    // 读取响应文本，按行分割成数组
-                    var imageUrls = this.responseText.split('\n');
+	   document.addEventListener('DOMContentLoaded', function() {
+        // 创建一个新的 XMLHttpRequest 对象
+        var xhr = new XMLHttpRequest();
+        // 配置请求类型、URL 以及异步处理方式
+        xhr.open('GET', '/static/assets/userData/author.json', true);
+        // 设置请求头，指明接受 JSON 格式的响应
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        // 当请求完成时执行的函数
+        xhr.onload = function() {
+            if (this.status === 200) {
+                try {
+                    // 解析 JSON 响应文本
+                    var data = JSON.parse(this.responseText);
+                    // 假设 JSON 文件中有一个名为 imgurls 的数组
+                    var imageUrls = data.imgurls;
                     // 获取所有 card-pin 元素
                     var cards = document.querySelectorAll('.card-pin');
                     // 将图片 URL 设置到 card-pin 的 img 元素上
@@ -381,28 +386,61 @@
                             card.querySelector('.card-img').src = imageUrls[index];
                         }
                     });
+
+                     var imageUrl = data.target.img;
+                    // 更新图片元素
+                    var cardImage = document.querySelector('.card-img-top');
+                    if (cardImage) {
+                        cardImage.src = imageUrl;
+                    }
+                    var targetData = data.target;
+                    // 获取列表元素
+                    var list = document.getElementById('ingredients-list');
+					var keysToInclude = ['MM Rating', 'Category', 'Star', 'Date'];
+
+                    // 遍历指定的键并添加到列表中
+                    keysToInclude.forEach(function(key) {
+                        if (targetData.hasOwnProperty(key)) {
+                            var listItem = document.createElement('li');
+                            listItem.textContent = key + ':   ' + targetData[key];
+                            list.appendChild(listItem);
+                        }
+                    });
+
+                    var link = document.querySelector('.btn-gray200');
+        			link.href = targetData['url']; // 将这里的 URL 替换为您想要设置的 URL
+ 					var heading = document.querySelector('.card-title.display-4');
+					// 设置新的文本内容
+					heading.textContent = targetData['Name']; // 将这里的 '新标题' 替换为您想要设置的新文本
+
+				 document.addEventListener('DOMContentLoaded', function() {
+
+    });
+                } catch (e) {
+                    console.error('Error parsing JSON!', e);
                 }
-            };
-            // 发送请求
-            xhr.send();
-<!--                           // 获取搜索按钮-->
-<!--        var searchButton = document.getElementById('search-button');-->
+            }
+        };
+        // 发送请求
+        xhr.send();
+<!--               // 获取搜索按钮-->
+        var searchButton = document.getElementById('search-button');
 
 <!--        // 绑定点击事件-->
-<!--        searchButton.addEventListener('click', function(event) {-->
+        searchButton.addEventListener('click', function(event) {
 <!--            // 阻止表单的默认提交行为-->
-<!--            event.preventDefault();-->
+            event.preventDefault();
 
 <!--            // 获取输入框的值-->
-<!--            var searchTerm = document.getElementById('search-input').value;-->
+            var searchTerm = document.getElementById('search-input').value;
 
 <!--            // 构建跳转的 URL-->
 <!--&lt;!&ndash;            var newUrl = 'https://example.com/search?query=' + encodeURIComponent(searchTerm);&ndash;&gt;-->
-<!--			var newUrl = 'http://127.0.0.1:8000/dev/post/'-->
+			var newUrl = 'http://127.0.0.1:8000/dev/post/'
 <!--            // 跳转到指定网址-->
-<!--            window.location.href = newUrl;-->
-<!--        });-->
+            window.location.href = newUrl;
         });
+    });
 </script>
 </body>
     
