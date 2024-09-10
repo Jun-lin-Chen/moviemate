@@ -76,10 +76,44 @@
             font-size: 20px;
         }
     </style>
+	    <style>
+        /* 美化侧边导航栏样式 */
+        .sidebar {
+            position: fixed;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 1000;
+            background-color: #ffcccc; /* 浅红色背景 */
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 添加阴影 */
+        }
+
+        .sidebar a {
+            display: block;
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #e60000; /* 红色背景 */
+            color: white; /* 白色文字 */
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s ease; /* 平滑过渡效果 */
+        }
+
+        .sidebar a:hover {
+            background-color: #cc0000; /* 鼠标悬停时更深一点的红色 */
+        }
+    </style>
 </head>
 
 <body>
-
+	 <div class="sidebar">
+        <a href="#top">Go to Top</a>
+		 <a href="#you-may-also-like">You may also like</a>
+        <a href="#bottom">Go to Bottom</a>
+    </div>
+	 <a name="top"></a>
     <nav class="navbar navbar-expand-lg navbar-light bg-white fixed-top">
     <a class="navbar-brand font-weight-bolder mr-3" href="/static/assets/img/img.png"><img src="/static/assets/img/logo.png"></a>
     <button class="navbar-light navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsDefault" aria-controls="navbarsDefault" aria-expanded="false" aria-label="Toggle navigation">
@@ -165,6 +199,7 @@
     </div>
     <div class="container-fluid mt-5">
     	<div class="row">
+				<a name="you-may-also-like"></a>
     		<h5 class="font-weight-bold">You may also like: </h5>
     		<div class="card-columns">
     			<div class="card card-pin">
@@ -282,7 +317,8 @@
     <div class="container">
         
           <div class="socials-media">
-    
+       		 <a name="bottom"></a>
+
             <ul class="list-unstyled">
               <li class="d-inline-block ml-1 mr-1"><a href="#" class="text-dark"><i class="fa fa-facebook"></i></a></li>
               <li class="d-inline-block ml-1 mr-1"><a href="#" class="text-dark"><i class="fa fa-twitter"></i></a></li>
@@ -386,8 +422,40 @@
 <!--            // 跳转到指定网址-->
             window.location.href = newUrl;
         });
+               // 获取侧边栏元素
+        var sidebar = document.getElementById('sidebar');
+        var isMouseDown = false; // 鼠标是否按下
+        var startX, startY; // 鼠标的初始位置
+        var sidebarX, sidebarY; // 侧边栏的初始位置
+
+        // 当鼠标按下时触发
+        sidebar.addEventListener('mousedown', function(e) {
+            isMouseDown = true;
+            startX = e.clientX;
+            startY = e.clientY;
+            sidebarX = sidebar.offsetLeft;
+            sidebarY = sidebar.offsetTop;
+        });
+
+        // 当鼠标移动时触发
+        document.addEventListener('mousemove', function(e) {
+            if (isMouseDown) {
+                var dx = e.clientX - startX; // 计算鼠标移动的距离
+                var dy = e.clientY - startY;
+                sidebar.style.left = (sidebarX + dx) + 'px'; // 更新侧边栏位置
+                sidebar.style.top = (sidebarY + dy) + 'px';
+            }
+        });
+
+        // 当鼠标释放时触发
+        document.addEventListener('mouseup', function() {
+            isMouseDown = false;
+        });
+
     });
 </script>
+
+
 </body>
     
 </html>
