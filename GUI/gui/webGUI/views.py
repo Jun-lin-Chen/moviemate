@@ -122,7 +122,10 @@ def index_view(request):
                             data = json.load(file)
                         if data:
                             #更新author.json的imgurls
-                            data['imgurls'].insert(0, results['url']) #从列表开头插入元素
+                            if results['url'] not in data['imgurls']:
+                                data['imgurls'].insert(0, results['url']) #从列表开头插入元素
+                            if len(data['imgurls']) > 20:  # 只保留最近的二十条搜索记录
+                                del data['imgurls'][20:]
                         else:
                             return HttpResponse('data is empty')
                         with open(r'D:\PythonProject\moviemate\movie-reommendation-system\GUI\gui\webGUI\static\assets\userData\author.json','w', encoding='utf-8') as file:
