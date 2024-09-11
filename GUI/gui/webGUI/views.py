@@ -122,7 +122,7 @@ def index_view(request):
                             data = json.load(file)
                         if data:
                             #更新author.json的imgurls
-                            data['imgurls'].append(results['url'])
+                            data['imgurls'].insert(0, results['url']) #从列表开头插入元素
                         else:
                             return HttpResponse('data is empty')
                         with open(r'D:\PythonProject\moviemate\movie-reommendation-system\GUI\gui\webGUI\static\assets\userData\author.json','w', encoding='utf-8') as file:
@@ -194,9 +194,6 @@ def best_10_movies_by_genre(cursor, genre):
         # 打印异常信息
         print(f'查找类别为 {genre} 的评分最高的10部电影时发生错误: {e}')
         return None
-
-from django.http import JsonResponse
-import requests
 
 
 def get_bot_response(message):

@@ -89,6 +89,18 @@ def read_excel(file_path):
         print('读取Excel文件时发生异常：', e)
         raise
 
+def read_csv(file_path):
+    try:
+        # 读取 CSV 文件
+        df = pd.read_csv(file_path, dtype=str)
+        # 替换 NaN 值为 ''
+        df.fillna('', inplace=True)
+        # 将 DataFrame 转换为列表
+        return df.values.tolist()
+    except Exception as e:
+        print('读取CSV文件时发生异常：', e)
+        raise
+
 
 def best_15_movies(cursor):
     try:
@@ -194,27 +206,27 @@ def main():
     try:
         connection = pymysql.connect(host=host, user=user, password=password, port=port, database=database, charset=charset)
         with connection.cursor() as cursor:
-            #评分最高的某一类别电影
-            genre = '科幻'
-            best_15_movies_genre = best_10_movies_by_genre(cursor, genre)
-            print(best_15_movies_genre)
-
-            best_movies = best_15_movies(cursor)
-            print(best_movies)
+            # #评分最高的某一类别电影
+            # genre = '科幻'
+            # best_15_movies_genre = best_10_movies_by_genre(cursor, genre)
+            # print(best_15_movies_genre)
+            #
+            # best_movies = best_15_movies(cursor)
+            # print(best_movies)
             # create_database(cursor, database)
             # cursor.execute(f"USE {database}")
             #
-            # create_douban_table(cursor)
-            #
-            # file_path = r'../爬取网站代码/豆瓣电影.xlsx'
-            # data = read_excel(file_path)
-            #
-            # print('数据长度', len(data))
-            #
-            # #delete_all_douban_data(cursor)
-            # add_all_douban_data(cursor, data)
-            # print("数据添加完成。")
-            #
+            create_douban_table(cursor)
+
+            file_path = r'../爬取网站代码/豆瓣电影.xlsx'
+            data = read_excel(file_path)
+
+            print('数据长度', len(data))
+
+            delete_all_douban_data(cursor)
+            add_all_douban_data(cursor, data)
+            print("数据添加完成。")
+
             # print("准备查询数据...")
             # search_movie_title = input('请输入要查询的电影的名称：')
             # if search_movie_title.strip():
