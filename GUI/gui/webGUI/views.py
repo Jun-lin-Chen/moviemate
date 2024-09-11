@@ -1,4 +1,4 @@
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 
 from django.shortcuts import HttpResponse  # 导入HttpResponse模块
@@ -34,7 +34,8 @@ def search_douban_data_by_title(cursor, title):
             'Category': result[2],
             'Star': result[1],
             'Date': result[4],
-            'url': result[9]
+            'url': result[9],
+            'detail_url':result[5]
         }
         return results
     except Exception as e:
@@ -116,7 +117,13 @@ def index_view(request):
                     category = results['Category'].split('/')[0]
                     print(f'category{category}')
                     #同类别评分最高的十部电影
-                    best_movies_url = best_10_movies_by_genre(cursor, category)
+                    best_movies = best_10_movies_by_genre(cursor, category)
+                    img_urls = []
+                    detail_urls = []
+                    for url in best_movies:
+                        img_urls.append(url['poster_url'])
+                        detail_urls.append((url['detail_url']))
+                    print(f'type:{best_movies}')
                     if results:
                         with open(r'D:\PythonProject\moviemate\movie-reommendation-system\GUI\gui\webGUI\static\assets\userData\author.json','r', encoding='utf-8') as file:
                             data = json.load(file)
@@ -124,18 +131,21 @@ def index_view(request):
                             #更新author.json的imgurls
                             if results['url'] not in data['imgurls']:
                                 data['imgurls'].insert(0, results['url']) #从列表开头插入元素
+                                data['detail_urls'].insert(0, results['detail_url'])
                             if len(data['imgurls']) > 20:  # 只保留最近的二十条搜索记录
                                 del data['imgurls'][20:]
                         else:
                             return HttpResponse('data is empty')
                         with open(r'D:\PythonProject\moviemate\movie-reommendation-system\GUI\gui\webGUI\static\assets\userData\author.json','w', encoding='utf-8') as file:
                             json.dump(data, file, ensure_ascii=False, indent=4)
+
                         with open(r'D:\PythonProject\moviemate\movie-reommendation-system\GUI\gui\webGUI\static\assets\userData\post.json','r', encoding='utf-8') as file:
                             data = json.load(file)
                         if data:
                             # 更新post.json的target和imgurls
                             data['target'] = results
-                            data['imgurls'] = best_movies_url
+                            data['imgurls'] = img_urls
+                            data['detail_urls'] = detail_urls
                         else:
                             return HttpResponse('data is empty')
                         with open(r'D:\PythonProject\moviemate\movie-reommendation-system\GUI\gui\webGUI\static\assets\userData\post.json','w', encoding='utf-8') as file:
@@ -172,32 +182,30 @@ def post_view(request):
 def best_10_movies_by_genre(cursor, genre):
     try:
         # 编写SQL查询语句，按评分降序排列，同时筛选特定类别,因为重复太多了，限制的数量可以适当增加，现在选的是300
-        sql = f'SELECT title, rating, poster_url FROM douban_movies WHERE genre LIKE %s ORDER BY rating DESC LIMIT 300'
+        sql = f'SELECT title, rating, poster_url, detail_url FROM douban_movies WHERE genre LIKE %s ORDER BY rating DESC LIMIT 300'
         # 执行SQL查询，传入类别参数
         cursor.execute(sql, ('%' + genre + '%',))
         # 获取查询结果
         results = cursor.fetchall()
         best_movies = []
         for row in results:
-            movie_name, rating, poster_url = row
+            movie_name, rating, poster_url, detail_url = row
             best_movies.append({
                 'title': movie_name,
                 'rating': rating,
-                'poster_url': poster_url
+                'poster_url': poster_url,
+                'detail_url': detail_url
             })
-        best_movies_poster_url = []
+        best_10_movies = []
         #防止重复
         for movie in best_movies:
-            poster_url = movie['poster_url']
-            if poster_url not in best_movies_poster_url:
-                best_movies_poster_url.append(poster_url)
-        best_10_movies_poster_url = best_movies_poster_url[:10]
-        return best_10_movies_poster_url
+            if movie not in best_10_movies:
+                best_10_movies.append(movie)
+        return best_10_movies
     except Exception as e:
         # 打印异常信息
         print(f'查找类别为 {genre} 的评分最高的10部电影时发生错误: {e}')
         return None
-
 
 def get_bot_response(message):
     # 这里替换为你的讯飞API密钥和相关的参数

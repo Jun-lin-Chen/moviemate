@@ -4,25 +4,11 @@
         "user-password": "123456"
     },
     "imgurls": [
-        "https://img9.doubanio.com/view/photo/s_ratio_poster/public/p2361744534.webp",
-        "https://img9.doubanio.com/view/photo/s_ratio_poster/public/p692813374.webp",
-        "https://img9.doubanio.com/view/photo/s_ratio_poster/public/p486667524.webp",
-        "https://img1.doubanio.com/view/photo/s_ratio_poster/public/p1421210839.webp",
-        "https://img3.doubanio.com/view/photo/s_ratio_poster/public/p2196652087.webp",
-        "https://img3.doubanio.com/view/photo/s_ratio_poster/public/p453192392.webp",
-        "https://img1.doubanio.com/view/photo/s_ratio_poster/public/p2237136718.webp",
-        "https://img1.doubanio.com/view/photo/s_ratio_poster/public/p2604491458.webp",
-        "https://img9.doubanio.com/view/photo/s_ratio_poster/public/p868550285.webp",
-        "https://img3.doubanio.com/view/photo/s_ratio_poster/public/p1281402537.webp",
-        "https://img3.doubanio.com/view/photo/s_ratio_poster/public/p2682331903.webp",
-        "https://img1.doubanio.com/view/photo/s_ratio_poster/public/p451926968.webp",
-        "https://img1.doubanio.com/view/photo/s_ratio_poster/public/p2398141939.webp",
-        "https://img9.doubanio.com/view/photo/s_ratio_poster/public/p2797313535.webp",
-        "https://img9.doubanio.com/view/photo/s_ratio_poster/public/p2614359276.webp",
-        "https://img3.doubanio.com/view/photo/s_ratio_poster/public/p511146957.webp",
         "https://img9.doubanio.com/view/photo/s_ratio_poster/public/p2540924496.webp",
-        "https://img2.doubanio.com/view/photo/s_ratio_poster/public/p1298673351.webp",
-        "https://img2.doubanio.com/view/photo/s_ratio_poster/public/p511118051.webp",
-        "https://img3.doubanio.com/view/photo/s_ratio_poster/public/p792394752.webp"
+        "https://img1.doubanio.com/view/photo/s_ratio_poster/public/p2561716440.webp"
+    ],
+    "detail_urls": [
+        "https://movie.douban.com/subject/1291560/",
+        "https://movie.douban.com/subject/1291546/"
     ]
 }
