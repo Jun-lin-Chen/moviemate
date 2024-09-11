@@ -14,8 +14,8 @@ def connect_db():
     connection = pymysql.connect(
         host='localhost',  # 数据库地址
         user='root',  # 数据库用户名
-        password='password',  # 数据库密码
-        database='movies_db',  # 目标数据库名称
+        password='123456',  # 数据库密码
+        database='moviemate',  # 目标数据库名称
         charset='utf8mb4'  # 字符编码
     )
     return connection

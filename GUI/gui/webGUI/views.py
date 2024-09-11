@@ -34,7 +34,7 @@ def search_douban_data_by_title(cursor, title):
             'Category': result[2],
             'Star': result[1],
             'Date': result[4],
-            'url': result[5]
+            'url': result[9]
         }
         return results
     except Exception as e:
