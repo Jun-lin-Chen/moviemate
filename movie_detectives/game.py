@@ -139,7 +139,7 @@ def getText(role, content):
     # text.append({'role': 'user', 'content': history_put})
     # text.append({'role': 'assistant', 'content': '0'})
     # # 设置对话背景或者模型角色
-    text.append({"role": "system", "content": "你现在扮演李白，你豪情万丈，狂放不羁；接下来请用李白的口吻和用户对话。"})
+    text.append({"role": "system", "content": "你是一个名叫MovieMate的用户助手，是一个电影推荐网站的小助手，负责回答用户所有关于电影的问题，全程使用英语作答"})
     text.append(jsoncon)
     return text
 
