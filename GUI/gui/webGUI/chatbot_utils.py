@@ -82,6 +82,9 @@ def run(ws, *args):
     ws.send(data)
 
 
+answer = "init"
+
+
 # 收到websocket消息的处理
 def on_message(ws, message):
     # print(message)
@@ -139,7 +142,7 @@ def getText(role, content):
     # text.append({'role': 'user', 'content': history_put})
     # text.append({'role': 'assistant', 'content': '0'})
     # # 设置对话背景或者模型角色
-    text.append({"role": "system", "content": "你是一个名叫MovieMate的用户助手，是一个电影推荐网站的小助手，负责回答用户所有关于电影的问题，全程使用英语作答"})
+    text.append({"role": "system", "content": "你是一个名叫MovieMate的用户助手，是一个电影推荐网站的小助手，负责回答用户所有关于电影的问题，注意用户问的问题都是关于电影的！全程使用英语作答,你的回答不要超过200词"})
     text.append(jsoncon)
     return text
 
@@ -171,27 +174,27 @@ def main(appid, api_secret, api_key, gpt_url, domain, query):
     ws.run_forever(sslopt={"cert_reqs": ssl.CERT_NONE})
 
 
-if __name__ == "__main__":
-    text.clear()
-    while 1:
-        Input = input("\n" + "Me:")
-        query = checklen(getText("user", Input))
-        answer = ""
-        print("MovieMate:", end="")
-        main(
-            appid="1fd7ab4e",  # 填写控制台中获取的 APPID 信息
-            api_secret="NmQ1ZTU5NDFkY2Q5NWNhZTM5ZGM4NmE1",  # 填写控制台中获取的 APISecret 信息
-            api_key="679684f5a7086dd84ff413486042687b",  # 填写控制台中获取的 APIKey 信息
-            # appid、api_secret、api_key三个服务认证信息请前往开放平台控制台查看（https://console.xfyun.cn/services/bm35）
-            gpt_url="wss://spark-api.xf-yun.com/v4.0/chat",
-            # Spark_url = "ws://spark-api.xf-yun.com/v3.1/chat"  # v3.0环境的地址
-            # Spark_url = "ws://spark-api.xf-yun.com/v2.1/chat"  # v2.0环境的地址
-            # Spark_url = "ws://spark-api.xf-yun.com/v1.1/chat"  # v1.5环境的地址
-            domain="4.0Ultra",
-            # domain = "generalv3"    # v3.0版本
-            # domain = "generalv2"    # v2.0版本
-            # domain = "general"    # v2.0版本
-            query=query
-        )
-        # 这里是获取星火AI模型助手的回答
-        getText("assistant", answer)
+# if __name__ == "__main__":
+#     text.clear()
+#     while 1:
+#         Input = input("\n" + "Me:")
+#         query = checklen(getText("user", Input))
+#         answer = ""
+#         print("MovieMate:", end="")
+#         main(
+#             appid="1fd7ab4e",  # 填写控制台中获取的 APPID 信息
+#             api_secret="NmQ1ZTU5NDFkY2Q5NWNhZTM5ZGM4NmE1",  # 填写控制台中获取的 APISecret 信息
+#             api_key="679684f5a7086dd84ff413486042687b",  # 填写控制台中获取的 APIKey 信息
+#             # appid、api_secret、api_key三个服务认证信息请前往开放平台控制台查看（https://console.xfyun.cn/services/bm35）
+#             gpt_url="wss://spark-api.xf-yun.com/v4.0/chat",
+#             # Spark_url = "ws://spark-api.xf-yun.com/v3.1/chat"  # v3.0环境的地址
+#             # Spark_url = "ws://spark-api.xf-yun.com/v2.1/chat"  # v2.0环境的地址
+#             # Spark_url = "ws://spark-api.xf-yun.com/v1.1/chat"  # v1.5环境的地址
+#             domain="4.0Ultra",
+#             # domain = "generalv3"    # v3.0版本
+#             # domain = "generalv2"    # v2.0版本
+#             # domain = "general"    # v2.0版本
+#             query=query
+#         )
+#         # 这里是获取星火AI模型助手的回答
+#         print(getText("assistant", answer))

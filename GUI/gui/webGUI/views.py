@@ -1,5 +1,6 @@
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
+from django.http import JsonResponse
 
 from django.shortcuts import HttpResponse  # 导入HttpResponse模块
 from .models import UserInfo
@@ -11,6 +12,8 @@ import hashlib
 import time
 from sparkai.llm.llm import ChatSparkLLM, ChunkPrintHandler
 from sparkai.core.messages import ChatMessage
+
+from . import chatbot_utils as util
 
 def helloworld(request):  # request是必须带的实例。类似class下方法必须带self一样
     return HttpResponse("Hello World!!")  # 通过HttpResponse模块直接返回字符串到前端页面
@@ -199,52 +202,91 @@ from django.http import JsonResponse
 import requests
 
 
-def get_bot_response(message):
-    # 这里替换为你的讯飞API密钥和相关的参数
-    API_KEY = '679684f5a7086dd84ff413486042687b'
-    URL = 'https://openapi.xfyun.cn/v2/aiui'  # 讯飞开放平台API的URL
-    APPID = '1fd7ab4e'  # 替换为你的讯飞应用ID
+# def get_bot_response(message):
+#     # 这里替换为你的讯飞API密钥和相关的参数
+#     API_KEY = '679684f5a7086dd84ff413486042687b'
+#     URL = 'https://openapi.xfyun.cn/v2/aiui'  # 讯飞开放平台API的URL
+#     APPID = '1fd7ab4e'  # 替换为你的讯飞应用ID
+#
+#     # 构建请求到科大讯飞API的参数
+#     body = {
+#         "header": {
+#             "app_id": APPID,
+#             "status": 2
+#         },
+#         "parameter": {
+#             "scene": "main",
+#             "auth_id": "your_auth_id",  # 替换为你的auth_id
+#             "data_type": "text",
+#             "sample_rate": "16000",
+#             "text": message
+#         }
+#     }
+#
+#     # 设置请求头
+#     headers = {
+#         'Content-Type': 'application/json',
+#         'X-Appid': APPID,
+#         'X-CurTime': str(int(time.time())),
+#         'X-Param': base64.b64encode(json.dumps(body["parameter"]).replace(' ', '').encode('utf-8')).decode('utf-8'),
+#         'X-CheckSum': hashlib.md5((API_KEY + str(int(time.time())) + base64.b64encode(
+#             json.dumps(body["parameter"]).replace(' ', '').encode('utf-8'))).encode('utf-8')).hexdigest()
+#     }
+#
+#     # 发送请求
+#     response = requests.post(URL, headers=headers, data=json.dumps(body))
+#
+#     if response.status_code == 200:
+#         result = response.json()
+#         if result['code'] == '00000':  # 根据讯飞API文档，'00000'通常表示成功
+#             return result['data']['answer']['text']
+#         else:
+#             return "对不起，讯飞API返回错误：" + result['desc']
+#     else:
+#         return "对不起，请求失败，状态码：" + str(response.status_code)
 
-    # 构建请求到科大讯飞API的参数
-    body = {
-        "header": {
-            "app_id": APPID,
-            "status": 2
-        },
-        "parameter": {
-            "scene": "main",
-            "auth_id": "your_auth_id",  # 替换为你的auth_id
-            "data_type": "text",
-            "sample_rate": "16000",
-            "text": message
-        }
-    }
 
-    # 设置请求头
-    headers = {
-        'Content-Type': 'application/json',
-        'X-Appid': APPID,
-        'X-CurTime': str(int(time.time())),
-        'X-Param': base64.b64encode(json.dumps(body["parameter"]).replace(' ', '').encode('utf-8')).decode('utf-8'),
-        'X-CheckSum': hashlib.md5((API_KEY + str(int(time.time())) + base64.b64encode(
-            json.dumps(body["parameter"]).replace(' ', '').encode('utf-8'))).encode('utf-8')).hexdigest()
-    }
-
-    # 发送请求
-    response = requests.post(URL, headers=headers, data=json.dumps(body))
-
-    if response.status_code == 200:
-        result = response.json()
-        if result['code'] == '00000':  # 根据讯飞API文档，'00000'通常表示成功
-            return result['data']['answer']['text']
-        else:
-            return "对不起，讯飞API返回错误：" + result['desc']
-    else:
-        return "对不起，请求失败，状态码：" + str(response.status_code)
-
-def quiz_view(request):
+def chat_view(request):
+    util.answer = ""
     if request.method == 'POST':
-        message = request.POST.get('message', '')
-        bot_response = get_bot_response(message)
-        return JsonResponse({'message': bot_response, 'sender': 'bot'})
-    return render(request, 'quiz.html') #返回渲染好的login界面
+        Input = request.POST['user_input']
+        query = util.checklen(util.getText("user", Input))
+        # print("MovieMate:", end="")
+        util.main(
+            appid="1fd7ab4e",  # 填写控制台中获取的 APPID 信息
+            api_secret="NmQ1ZTU5NDFkY2Q5NWNhZTM5ZGM4NmE1",  # 填写控制台中获取的 APISecret 信息
+            api_key="679684f5a7086dd84ff413486042687b",  # 填写控制台中获取的 APIKey 信息
+            # appid、api_secret、api_key三个服务认证信息请前往开放平台控制台查看（https://console.xfyun.cn/services/bm35）
+            gpt_url="wss://spark-api.xf-yun.com/v4.0/chat",
+            # Spark_url = "ws://spark-api.xf-yun.com/v3.1/chat"  # v3.0环境的地址
+            # Spark_url = "ws://spark-api.xf-yun.com/v2.1/chat"  # v2.0环境的地址
+            # Spark_url = "ws://spark-api.xf-yun.com/v1.1/chat"  # v1.5环境的地址
+            domain="4.0Ultra",
+            # domain = "generalv3"    # v3.0版本
+            # domain = "generalv2"    # v2.0版本
+            # domain = "general"    # v2.0版本
+            query=query
+        )
+        bot_response = next(
+            (item['content'] for item in reversed(util.getText("assistant", util.answer)) if item['role'] == 'assistant'), None)
+        print("bot",bot_response)
+        return JsonResponse({'response': bot_response})
+        # response = openai.ChatCompletion.create(
+        #     model="gpt-3.5-turbo",
+        #     messages=[
+        #         {"role": "system", "content": "You are a helpful assistant."},
+        #         {"role": "user", "content": user_input},
+        #     ],
+        #     temperature=0.5,
+        #     max_tokens=150,
+        #     top_p=1,
+        #     frequency_penalty=0,
+        #     presence_penalty=0,
+        #     n=1,
+        #     stop=["\nUser:"],
+        # )
+        #
+        # bot_response = response["choices"][0]["message"]["content"]
+
+
+    return render(request, 'chat.html')

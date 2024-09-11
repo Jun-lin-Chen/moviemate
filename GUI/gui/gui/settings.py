@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "webGUI",
     "bootstrap4",
+    'channels'
 ]
 
 MIDDLEWARE = [
@@ -137,3 +138,13 @@ STATICFILES_ROOT=(os.path.join(BASE_DIR,'static'),)
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'asgi_redis.RedisChannelLayer',
+        'CONFIG': {
+            'hosts': [('localhost', 6379)],
+        },
+        'ROUTING': 'webGUI.routing.channel_routing',
+    }
+}
