@@ -96,7 +96,7 @@ def read_csv(file_path):
 def best_15_movies(cursor):
     try:
         # 编写SQL查询语句，按评分降序排列，并限制结果为前15条
-        sql = 'SELECT title, mm_rating, poster_url , detail_url FROM moviemate_movies ORDER BY rating DESC LIMIT 100'
+        sql = 'SELECT title, mm_rating, poster_url , detail_url FROM moviemate_movies ORDER BY rating DESC LIMIT 300'
         # 执行SQL查询
         cursor.execute(sql)
         # 获取查询结果
@@ -196,21 +196,21 @@ def main():
         connection = pymysql.connect(host=host, user=user, password=password, port=port, database=database, charset=charset)
         with connection.cursor() as cursor:
             best_movies = best_15_movies(cursor)
-            print(f'best_movies:{best_movies}')
+            print(f'best_movies:{len(best_movies)}')
 
-            create_database(cursor, database)
-            cursor.execute(f"USE {database}")
-
-            create_moviemate_table(cursor)
-
-            file_path = r'../爬取网站代码/moviemate电影.xlsx'
-            data = read_xlsx(file_path)
-
-            print('数据长度', len(data))
-
-            delete_all_moviemate_data(cursor)
-            add_all_moviemate_data(cursor, data)
-            print("数据添加完成。")
+            # create_database(cursor, database)
+            # cursor.execute(f"USE {database}")
+            #
+            # create_moviemate_table(cursor)
+            #
+            # file_path = r'../爬取网站代码/moviemate电影.xlsx'
+            # data = read_xlsx(file_path)
+            #
+            # print('数据长度', len(data))
+            #
+            # delete_all_moviemate_data(cursor)
+            # add_all_moviemate_data(cursor, data)
+            # print("数据添加完成。")
 
             # print("准备查询数据...")
             # search_movie_title = input('请输入要查询的电影的名称：')

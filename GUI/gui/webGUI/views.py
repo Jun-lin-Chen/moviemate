@@ -118,9 +118,9 @@ def index_view(request):
                             if results['url'] not in data['imgurls']:
                                 data['imgurls'].insert(0, results['url']) #从列表开头插入元素
                                 data['detail_urls'].insert(0, results['detail_url'])
-                            # if len(data['imgurls']) > 20 and len(data['detail_urls'] > 20):  # 只保留最近的二十条搜索记录
-                            #     del data['imgurls'][20:]
-                            #     del data['detail_urls'][20:]
+                            if len(data['imgurls']) > 20 and len(data['detail_urls']) > 20:  # 只保留最近的二十条搜索记录
+                                del data['imgurls'][20:]
+                                del data['detail_urls'][20:]
                         else:
                             return HttpResponse('data is empty')
                         with open(r'D:\PythonProject\moviemate\movie-reommendation-system\GUI\gui\webGUI\static\assets\userData\author.json','w', encoding='utf-8') as file:
@@ -174,7 +174,7 @@ def search_moviemate_data_by_title(cursor, title):
         }
         return results
     except Exception as e:
-        print('查询douban电影数据库时发生异常：', e)
+        print('查询moviemate电影数据库时发生异常：', e)
         raise
 
 #同类别评分最高的十部电影
