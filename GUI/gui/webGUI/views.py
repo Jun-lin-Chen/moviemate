@@ -159,7 +159,6 @@ def index_view(request):
 def search_moviemate_data_by_title(cursor, title):
     try:
         sql = 'SELECT * FROM moviemate_movies WHERE title LIKE %s'
-        # cursor.execute(sql, (title,))
         cursor.execute(sql, ('%' + title + '%',))
         result = cursor.fetchone()
         results = {

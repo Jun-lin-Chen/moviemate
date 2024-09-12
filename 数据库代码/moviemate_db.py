@@ -26,7 +26,9 @@ def create_moviemate_table(cursor):
             rating VARCHAR(255) NOT NULL,
             rating_count VARCHAR(255) NOT NULL,
             poster_url VARCHAR(255) NOT NULL,
-            mm_rating VARCHAR(255) NOT NULL
+            mm_rating VARCHAR(255) NOT NULL,
+            IMDB_rating VARCHAR(255) NOT NULL,
+            maoyan_rating VARCHAR(255) NOT NULL
         )
         '''
         cursor.execute(sql)
@@ -37,7 +39,7 @@ def create_moviemate_table(cursor):
 
 def add_all_moviemate_data(cursor, data):
     try:
-        sql = 'INSERT IGNORE INTO moviemate_movies(director, starring, genre, region, year, detail_url, title, rating, rating_count, poster_url, mm_rating) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
+        sql = 'INSERT IGNORE INTO moviemate_movies(director, starring, genre, region, year, detail_url, title, rating, rating_count, poster_url, mm_rating, IMDB_rating, maoyan_rating) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
         cursor.executemany(sql, data)
         cursor.connection.commit()
         print(f"成功添加 {cursor.rowcount} 条数据。")
@@ -96,7 +98,7 @@ def read_csv(file_path):
 def best_15_movies(cursor):
     try:
         # 编写SQL查询语句，按评分降序排列，并限制结果为前15条
-        sql = 'SELECT title, mm_rating, poster_url , detail_url FROM moviemate_movies ORDER BY rating DESC LIMIT 300'
+        sql = 'SELECT title, mm_rating, poster_url , detail_url FROM moviemate_movies ORDER BY mm_rating DESC LIMIT 15'
         # 执行SQL查询
         cursor.execute(sql)
         # 获取查询结果
