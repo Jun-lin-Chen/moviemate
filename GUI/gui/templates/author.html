@@ -401,6 +401,11 @@
                             card.querySelector('.card-img').src = imageUrls[index];
                         }
                     });
+				var links = document.querySelectorAll('.more a');
+					var detail_Urls = data.detail_urls;
+					links.forEach(function(link, index) {
+					link.href = detail_Urls[index];
+				});
 
                      var imageUrl = data.target.img;
                     // 更新图片元素
@@ -422,15 +427,21 @@
                         }
                     });
 
+				var userNameElement = document.querySelector('.title');
+                // 将JSON中的user_name替换到User Name中
+                userNameElement.textContent = data.target.user_name;
+
                     var link = document.querySelector('.btn-gray200');
         			link.href = targetData['url']; // 将这里的 URL 替换为您想要设置的 URL
  					var heading = document.querySelector('.card-title.display-4');
 					// 设置新的文本内容
 					heading.textContent = targetData['Name']; // 将这里的 '新标题' 替换为您想要设置的新文本
 
+
 				 document.addEventListener('DOMContentLoaded', function() {
 
     });
+
                 } catch (e) {
                     console.error('Error parsing JSON!', e);
                 }

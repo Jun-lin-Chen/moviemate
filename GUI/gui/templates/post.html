@@ -377,7 +377,11 @@
                             card.querySelector('.card-img').src = imageUrls[index];
                         }
                     });
-
+					var links = document.querySelectorAll('.more a');
+					var detail_Urls = data.detail_urls;
+					links.forEach(function(link, index) {
+					link.href = detail_Urls[index];
+				});
                      var imageUrl = data.target.img;
                     // 更新图片元素
                     var cardImage = document.querySelector('.card-img-top');
