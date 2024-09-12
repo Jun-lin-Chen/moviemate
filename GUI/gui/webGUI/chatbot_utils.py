@@ -121,7 +121,7 @@ def gen_params(appid, query, domain):
             "chat": {
                 "domain": domain,
                 "temperature": 0.5,
-                "max_tokens": 512,
+                "max_tokens": 256,
                 "auditing": "default",
             }
         },
