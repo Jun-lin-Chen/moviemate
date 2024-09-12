@@ -97,7 +97,7 @@ def index_view(request):
             if connection:
                 with connection.cursor() as cursor:
                     #搜索到的电影信息
-                    results = search_douban_data_by_title(cursor, question)
+                    results = search_moviemate_data_by_title(cursor, question)
                     # 搜索电影的类别,多个类别取第一个
                     category = results['Category'].split('/')[0]
                     print(f'category{category}')
@@ -118,9 +118,9 @@ def index_view(request):
                             if results['url'] not in data['imgurls']:
                                 data['imgurls'].insert(0, results['url']) #从列表开头插入元素
                                 data['detail_urls'].insert(0, results['detail_url'])
-                            if len(data['imgurls']) > 20 and len(data['detail_urls'] > 20):  # 只保留最近的二十条搜索记录
-                                del data['imgurls'][20:]
-                                del data['detail_urls'][20:]
+                            # if len(data['imgurls']) > 20 and len(data['detail_urls'] > 20):  # 只保留最近的二十条搜索记录
+                            #     del data['imgurls'][20:]
+                            #     del data['detail_urls'][20:]
                         else:
                             return HttpResponse('data is empty')
                         with open(r'D:\PythonProject\moviemate\movie-reommendation-system\GUI\gui\webGUI\static\assets\userData\author.json','w', encoding='utf-8') as file:
@@ -156,16 +156,16 @@ def index_view(request):
         return render(request, 'index.html')
 
 #根据标题从数据库中搜索电影信息
-def search_douban_data_by_title(cursor, title):
+def search_moviemate_data_by_title(cursor, title):
     try:
-        sql = 'SELECT * FROM douban_movies WHERE title LIKE %s'
+        sql = 'SELECT * FROM moviemate_movies WHERE title LIKE %s'
         # cursor.execute(sql, (title,))
         cursor.execute(sql, ('%' + title + '%',))
         result = cursor.fetchone()
         results = {
             'Name': result[6],
             'img': result[9],
-            'MM Rating': result[7],
+            'MM Rating': result[10],
             'Category': result[2],
             'Star': result[1],
             'Date': result[4],
@@ -181,17 +181,17 @@ def search_douban_data_by_title(cursor, title):
 def best_10_movies_by_genre(cursor, genre):
     try:
         # 编写SQL查询语句，按评分降序排列，同时筛选特定类别,因为重复太多了，限制的数量可以适当增加，现在选的是300
-        sql = f'SELECT title, rating, poster_url, detail_url FROM douban_movies WHERE genre LIKE %s ORDER BY rating DESC LIMIT 300'
+        sql = f'SELECT title, mm_rating, poster_url, detail_url FROM moviemate_movies WHERE genre LIKE %s ORDER BY mm_rating DESC LIMIT 500'
         # 执行SQL查询，传入类别参数
         cursor.execute(sql, ('%' + genre + '%',))
         # 获取查询结果
         results = cursor.fetchall()
         best_movies = []
         for row in results:
-            movie_name, rating, poster_url, detail_url = row
+            movie_name, mm_rating, poster_url, detail_url = row
             best_movies.append({
                 'title': movie_name,
-                'rating': rating,
+                'mm_rating': mm_rating,
                 'poster_url': poster_url,
                 'detail_url': detail_url
             })

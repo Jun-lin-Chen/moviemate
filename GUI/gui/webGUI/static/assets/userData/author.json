@@ -4,6 +4,8 @@
         "user-password": "123456"
     },
     "imgurls": [
+        "https://img9.doubanio.com/view/photo/s_ratio_poster/public/p2549507296.webp",
+        "https://img3.doubanio.com/view/photo/s_ratio_poster/public/p792394752.webp",
         "https://img1.doubanio.com/view/photo/s_ratio_poster/public/p2186920269.webp",
         "https://img1.doubanio.com/view/photo/s_ratio_poster/public/p2557573348.webp",
         "https://img3.doubanio.com/view/photo/s_ratio_poster/public/p1344888983.webp",
@@ -26,6 +28,8 @@
         "https://img1.doubanio.com/view/photo/s_ratio_poster/public/p2561716440.webp"
     ],
     "detail_urls": [
+        "https://movie.douban.com/subject/1440898/",
+        "https://movie.douban.com/subject/1777612/",
         "https://movie.douban.com/subject/1393859/",
         "https://movie.douban.com/subject/1291561/",
         "https://movie.douban.com/subject/2297265/",
